@@ -1,6 +1,6 @@
 from competition.models import Competition, CompetitionPreferences
 from competition.view_modifiers import CompetitionViewModifier
-from panya.generic.views import GenericObjectList, GenericObjectDetail
+from jmbo.generic.views import GenericObjectList, GenericObjectDetail
 from preferences import preferences
 
 class ObjectList(GenericObjectList):

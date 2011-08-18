@@ -1,17 +1,17 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='panya-competition',
+    name='jmbo-competition',
     version='0.0.4',
-    description='Panya competition app.',
+    description='Jmbo competition app.',
     long_description = open('README.rst', 'r').read(),
     author='Praekelt International',
     author_email='dev@praekelt.com',
     license='BSD',
-    url='http://github.com/praekelt/panya-competition',
+    url='http://github.com/praekelt/jmbo-competition',
     packages = find_packages(),
     install_requires = [
-        'panya',
+        'jmbo',
     ],
     include_package_data=True,
     classifiers = [
