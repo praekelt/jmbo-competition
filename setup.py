@@ -12,7 +12,13 @@ setup(
     packages = find_packages(),
     install_requires = [
         'jmbo',
+        'django-ckeditor',
+        'django-preferences',
     ],
+    tests_require=[
+        'django-setuptest',
+    ],
+    test_suite="setuptest.SetupTestSuite",
     include_package_data=True,
     classifiers = [
         "Programming Language :: Python",
