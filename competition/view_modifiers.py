@@ -9,8 +9,8 @@ class CompetitionViewModifier(ViewModifier):
             URLPatternItem(
                 request,
                 title="Current Competitions",
-                path=reverse('competition_object_list', kwargs={}),
-                matching_pattern_names=['competition_object_list', ],
+                path=reverse('competition-object-list', kwargs={}),
+                matching_pattern_names=['competition-object-list', ],
                 default=False
             ),
             URLPatternItem(
