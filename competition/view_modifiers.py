@@ -16,8 +16,8 @@ class CompetitionViewModifier(ViewModifier):
             URLPatternItem(
                 request,
                 title="Competition Rules",
-                path=reverse('competition_preferences_detail', kwargs={}),
-                matching_pattern_names=['competition_preferences_detail', ],
+                path=reverse('competition-preferences-info', kwargs={}),
+                matching_pattern_names=['competition-preferences-info', ],
                 default=False
             ),
         ]
