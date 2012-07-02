@@ -4,9 +4,11 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from ckeditor.fields import RichTextField
 from jmbo.models import ModelBase
+
 from preferences.models import Preferences
+
+from ckeditor.fields import RichTextField
 
 
 class Competition(ModelBase):
@@ -45,7 +47,7 @@ class Competition(ModelBase):
     )
 
     def get_absolute_url(self):
-        return reverse('competition_object_detail', kwargs={'slug': self.slug})
+        return reverse('competition-object-detail', kwargs={'slug': self.slug})
 
     def __unicode__(self):
         return self.title

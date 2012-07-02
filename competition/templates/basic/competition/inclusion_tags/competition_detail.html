@@ -1,0 +1,25 @@
+{% load i18n jmbo_template_tags %}
+
+<div class="object-detail-inclusion {{ object.class_name.lower }}-detail-inclusion">
+    {% if object.image %}
+        <img src="{{ object.image_detail_url }}" />
+    {% endif %}
+    {{ object.content|safe }}
+
+    {% if object.question %}
+        <div class="title">{{ object.question }}</div>
+        {{ object.question_blurb|safe }}
+        {% with object.get_absolute_url|add:"enter/" as entry_url %}
+            <form action="{{ entry_url }}" method="post">
+                {{ competition_entry_form }}
+            </form>
+        {% endwith %}
+    {% endif %}
+
+    {% if object.rules %}
+        <div class="rules">
+            <div class="title">{% trans "Competition rules" %}</div>
+            {{ object.rules|safe }}
+        </div>
+    {% endif %}
+</div>

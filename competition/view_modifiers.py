@@ -1,6 +1,7 @@
+from django.core.urlresolvers import reverse
+
 from jmbo.view_modifiers import ViewModifier
 from jmbo.view_modifiers.items import URLPatternItem
-from django.core.urlresolvers import reverse
 
 
 class CompetitionViewModifier(ViewModifier):
@@ -9,15 +10,15 @@ class CompetitionViewModifier(ViewModifier):
             URLPatternItem(
                 request,
                 title="Current Competitions",
-                path=reverse('competition_object_list', kwargs={}),
-                matching_pattern_names=['competition_object_list', ],
+                path=reverse('competition-object-list', kwargs={}),
+                matching_pattern_names=['competition-object-list', ],
                 default=False
             ),
             URLPatternItem(
                 request,
                 title="Competition Rules",
-                path=reverse('competition_preferences_detail', kwargs={}),
-                matching_pattern_names=['competition_preferences_detail', ],
+                path=reverse('competition-preferences-info', kwargs={}),
+                matching_pattern_names=['competition-preferences-info', ],
                 default=False
             ),
         ]

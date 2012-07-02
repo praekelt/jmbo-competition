@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load jmbo_inclusion_tags %} 
+
+{% block content %}
+    <div class="page section_competition object-detail competition-preferences-detail">
+        <div class="title">{{ title }}</div>
+
+        {% view_modifier view_modifier %}
+
+        <div class="rules">
+            {{ object.rules|safe }}
+        </div>
+    </div>
+{% endblock %}
