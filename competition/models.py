@@ -47,7 +47,7 @@ class Competition(ModelBase):
     )
 
     def get_absolute_url(self):
-        return reverse('competition-object-detail', kwargs={'slug': self.slug})
+        return reverse('competition-detail', kwargs={'slug': self.slug})
 
     def __unicode__(self):
         return self.title

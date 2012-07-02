@@ -9,12 +9,11 @@
     {% if object.question %}
         <div class="title">{{ object.question }}</div>
         {{ object.question_blurb|safe }}
-        {% with object.get_absolute_url|add:"enter/" as entry_url %}
-            <form action="{{ entry_url }}" method="post">
-                {{ competition_entry_form }}
-            </form>
-        {% endwith %}
     {% endif %}
+
+    <form action="{{ object.get_absolute_url }}" method="post">
+        {{ competition_entry_form }}
+    </form>
 
     {% if object.rules %}
         <div class="rules">

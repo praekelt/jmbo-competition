@@ -7,6 +7,6 @@ urlpatterns = patterns(
             name='competition-object-list'),
     url(r'^info/$', 'preferences_info',
             name='competition-preferences-info'),
-    url(r'^(?P<slug>[\w-]+)/$', 'object_detail',
-            name='competition-object-detail',),
+    url(r'^(?P<slug>[\w-]+)/$', 'competition_detail',
+            name='competition-detail',),
 )

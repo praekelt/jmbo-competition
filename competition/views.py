@@ -1,3 +1,8 @@
+from django.utils.translation import ugettext as _
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
+
 from jmbo.generic.views import GenericObjectList, GenericObjectDetail
 
 from preferences import preferences
@@ -23,19 +28,6 @@ class ObjectList(GenericObjectList):
 object_list = ObjectList()
 
 
-class ObjectDetail(GenericObjectDetail):
-    def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions', 'competition_entry_form': CompetitionEntryForm()}
-
-    def get_view_modifier(self, request, *args, **kwargs):
-        return CompetitionViewModifier(request=request, slug=None)
-
-    def get_queryset(self, *args, **kwargs):
-        return Competition.permitted.all()
-
-object_detail = ObjectDetail()
-
-
 class PreferencesInfo(GenericObjectDetail):
     def get_extra_context(self, *args, **kwargs):
         return {'title': 'Competitions'}
@@ -58,3 +50,21 @@ class PreferencesInfo(GenericObjectDetail):
         )
 
 preferences_info = PreferencesInfo()
+
+
+def competition_detail(request, slug):
+    competition = get_object_or_404(Competition, slug=slug)
+    if request.method == 'POST':
+        form = CompetitionEntryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            msg = _("You have entered the competition")
+            messages.success(request, msg, fail_silently=True)
+    else:
+        form = CompetitionEntryForm()
+    
+    extra = {"competition_entry_form": form, "object": competition,
+        "view_modifier": CompetitionViewModifier(request=request, slug=None)}
+    return render_to_response("competition/competition_detail.html", extra,
+        context_instance=RequestContext(request))
+
