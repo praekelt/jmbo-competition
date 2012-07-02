@@ -18,7 +18,9 @@
     {% endif %}
 
     {% if object.rules %}
-        <div class="title">{% trans "Competition Rules" %}</div>
-        {{ object.rules|safe }}
+        <div class="rules">
+            <div class="title">{% trans "Competition rules" %}</div>
+            {{ object.rules|safe }}
+        </div>
     {% endif %}
 </div>
