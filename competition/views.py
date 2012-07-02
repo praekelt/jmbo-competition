@@ -1,7 +1,10 @@
+from jmbo.generic.views import GenericObjectList, GenericObjectDetail
+
+from preferences import preferences
+
 from competition.models import Competition, CompetitionPreferences
 from competition.view_modifiers import CompetitionViewModifier
-from jmbo.generic.views import GenericObjectList, GenericObjectDetail
-from preferences import preferences
+from competition.forms import CompetitionEntryForm
 
 
 class ObjectList(GenericObjectList):
@@ -22,7 +25,7 @@ object_list = ObjectList()
 
 class ObjectDetail(GenericObjectDetail):
     def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions'}
+        return {'title': 'Competitions', 'competition_entry_form': CompetitionEntryForm()}
 
     def get_view_modifier(self, request, *args, **kwargs):
         return CompetitionViewModifier(request=request, slug=None)

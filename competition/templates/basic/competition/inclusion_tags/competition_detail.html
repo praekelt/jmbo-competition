@@ -9,12 +9,11 @@
     {% if object.question %}
         <div class="title">{{ object.question }}</div>
         {{ object.question_blurb|safe }}
-        {% comment %}
-            <form id="frmEnterCompetition" action="#" method="post">
-                    <p><input type="text" name="competition_answer" value="" class="shift" /></p>
-                    <p><input type="submit" name="submit" value="" class="btn" /></p>
+        {% with object.get_absolute_url|add:"enter/" as entry_url %}
+            <form action="{{ entry_url }}" method="post">
+                {{ competition_entry_form }}
             </form>
-        {% endcomment %}
+        {% endwith %}
     {% endif %}
 
     {% if object.rules %}
