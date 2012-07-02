@@ -2,16 +2,13 @@
 {% load jmbo_inclusion_tags %} 
 
 {% block content %}
-    <div class="page section_competitions">
-	    <div class="title">
-		    <h1>{{ title }}</h1>
-		</div>
+    <div class="page section_competition object-detail competition-preferences-detail">
+        <div class="title">{{ title }}</div>
 
         {% view_modifier view_modifier %}
-        
-        <div class="post no_bord rich">
-            <p>{{ object.rules|safe }}</p>
-        </div>
 
-	</div>
+        <div class="rules">
+            {{ object.rules|safe }}
+        </div>
+    </div>
 {% endblock %}
