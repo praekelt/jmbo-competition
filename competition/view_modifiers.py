@@ -1,6 +1,7 @@
+from django.core.urlresolvers import reverse
+
 from jmbo.view_modifiers import ViewModifier
 from jmbo.view_modifiers.items import URLPatternItem
-from django.core.urlresolvers import reverse
 
 
 class CompetitionViewModifier(ViewModifier):

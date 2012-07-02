@@ -4,9 +4,11 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from ckeditor.fields import RichTextField
 from jmbo.models import ModelBase
+
 from preferences.models import Preferences
+
+from ckeditor.fields import RichTextField
 
 
 class Competition(ModelBase):

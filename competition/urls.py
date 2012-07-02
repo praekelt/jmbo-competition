@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 
+
 urlpatterns = patterns(
     'competition.views',
     url(r'^list/$', 'object_list', 

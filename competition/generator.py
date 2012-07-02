@@ -6,6 +6,7 @@ from django.conf import settings
 from generate import IMAGES
 from generate.json_loader import load_json
 
+
 COMPETITION_COUNT = 10
 
 
