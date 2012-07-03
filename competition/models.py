@@ -51,7 +51,8 @@ class Competition(ModelBase):
     def __init__(self, *args, **kwargs):
         super(Competition, self).__init__(*args, **kwargs)
         # split list of correct answers and remove leading/trailing spaces
-        self.correct_answer_list = [a.strip() for a in self.correct_answer.split(",")]
+        if self.correct_answer:
+            self.correct_answer_list = [a.strip() for a in self.correct_answer.split(",")]
 
     def get_absolute_url(self):
         return reverse("competition-object-detail", kwargs={"slug": self.slug})
