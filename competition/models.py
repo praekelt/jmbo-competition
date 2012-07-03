@@ -15,16 +15,6 @@ from ckeditor.fields import RichTextField
 # This model tries to encapsulate the most common forms a competition can take
 class Competition(ModelBase):
     content = RichTextField()
-    start_date = models.DateField(
-        blank=True,
-        null=True,
-        help_text="Date the competition starts."
-    )
-    end_date = models.DateField(
-        blank=True,
-        null=True,
-        help_text="Date the competition ends."
-    )
     question = models.CharField(
         blank=True,
         null=True,
@@ -40,12 +30,23 @@ class Competition(ModelBase):
         max_length=255,
         blank=True,
         null=True,
-        help_text="Answer used to determine winning entries. If there are multiple answers, enter a comma-separated list (not case-sensitive)."
+        help_text="Answer used to determine winning entries. If there are multiple correct answers, enter a comma-separated list (not case-sensitive). If multichoice answers are required, see answer options below."
     )
     rules = RichTextField(
         blank=True,
         null=True,
         help_text="Rules specific to this competition.",
+    )
+    
+    start_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Date the competition starts."
+    )
+    end_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Date the competition ends."
     )
 
     def __init__(self, *args, **kwargs):
