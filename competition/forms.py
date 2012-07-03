@@ -1,10 +1,12 @@
 from django import forms
 
+from jmbo.forms import as_div
+
 from competition.models import CompetitionEntry
 
 
-class CompetitionEntryForm(forms.ModelForm):
+class CompetitionEntryForm(forms.Form):
+    answer = forms.CharField(max_length=255)
     
-    class Meta:
-        model = CompetitionEntry
+    as_div = as_div
     

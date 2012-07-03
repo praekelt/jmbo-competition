@@ -11,8 +11,12 @@
         {{ object.question_blurb|safe }}
     {% endif %}
 
-    <form action="{{ object.get_absolute_url }}" method="post">
-        {{ competition_entry_form }}
+    <form action="{% url competition-detail object.slug %}" method="POST">
+        {% csrf_token %}
+        {{ competition_entry_form.as_div }}
+        <div class="buttons">
+            <input type="submit" value="{% trans "Enter" %}" />
+        </div>
     </form>
 
     {% if object.rules %}
