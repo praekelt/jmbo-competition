@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from datetime import datetime
+
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
@@ -37,7 +39,10 @@ class Competition(ModelBase):
         null=True,
         help_text="Rules specific to this competition.",
     )
-    
+    max_entries_per_user = models.IntegerField(
+        required=True,
+        default=1
+    )
     start_date = models.DateField(
         blank=True,
         null=True,
@@ -57,6 +62,22 @@ class Competition(ModelBase):
 
     def get_absolute_url(self):
         return reverse('competition-detail', kwargs={'slug': self.slug})
+
+    def can_enter(self, request):
+        if request.user.is_authenticated():
+            current_date = datetime.now()
+            if current_date < self.start_date:
+                return False, 'not_started'
+            elif current_date > self.end_date:
+                return False, 'ended'
+            else:
+                if CompetitionEntry.objects.filter(user=request.user) \
+                    .count() >= self.max_entries_per_user:
+                    return False, 'max_entries'
+                else
+                    return True, 'can_enter'
+        else:
+            return False, 'auth_required'
 
     def __unicode__(self):
         return self.title
