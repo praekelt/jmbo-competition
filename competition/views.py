@@ -9,7 +9,7 @@ from preferences import preferences
 
 from competition.models import Competition, CompetitionPreferences
 from competition.view_modifiers import CompetitionViewModifier
-from competition.forms import CompetitionEntryForm
+from competition.forms import SingleAnswerEntryForm, MultichoiceEntryForm
 
 
 class ObjectList(GenericObjectList):
@@ -55,13 +55,15 @@ preferences_info = PreferencesInfo()
 def competition_detail(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
     if request.method == 'POST':
-        form = CompetitionEntryForm(request.POST)
+        form = SingleAnswerEntryForm(request.POST,
+            request=request, competition=competition)
         if form.is_valid():
             form.save()
             msg = _("You have entered the competition")
             messages.success(request, msg, fail_silently=True)
     else:
-        form = CompetitionEntryForm()
+        form = SingleAnswerEntryForm(
+            request=request, competition=competition)
     
     extra = {"competition_entry_form": form, "object": competition,
         "view_modifier": CompetitionViewModifier(request=request, slug=None)}
