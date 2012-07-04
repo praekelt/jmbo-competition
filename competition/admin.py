@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from preferences.admin import PreferencesAdmin
 
@@ -24,9 +25,9 @@ class CompetitionAnswerOptionAdminFormSet(BaseInlineFormSet):
                     break
             if has_options:
                 if not self.instance.question:
-                    raise forms.ValidationError("You cannot have competition answers without a question.")
+                    raise forms.ValidationError(_("You cannot have competition answers without a question."))
                 elif self.instance.correct_answer:
-                    raise forms.ValidationError("You must either provide a correct answer or answer options, not both.")
+                    raise forms.ValidationError(_("You must either provide a correct answer or answer options, not both."))
     
 
 class CompetitionAdminForm(ModelBaseAdminForm):
@@ -34,7 +35,7 @@ class CompetitionAdminForm(ModelBaseAdminForm):
     def clean(self):
         cleaned_data = super(CompetitionAdminForm, self).clean()
         if cleaned_data['correct_answer'] and not cleaned_data['question']:
-            raise forms.ValidationError("You cannot have competition answer without a question.")
+            raise forms.ValidationError(_("You cannot have competition answer without a question."))
         return cleaned_data
 
 

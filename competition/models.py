@@ -1,8 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from django.contrib.auth.models import User
-from datetime import datetime
-
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
@@ -40,7 +38,6 @@ class Competition(ModelBase):
         help_text="Rules specific to this competition.",
     )
     max_entries_per_user = models.IntegerField(
-        required=True,
         default=1
     )
     start_date = models.DateField(
@@ -65,7 +62,7 @@ class Competition(ModelBase):
 
     def can_enter(self, request):
         if request.user.is_authenticated():
-            current_date = datetime.now()
+            current_date = date.today()
             if current_date < self.start_date:
                 return False, 'not_started'
             elif current_date > self.end_date:
@@ -74,7 +71,7 @@ class Competition(ModelBase):
                 if CompetitionEntry.objects.filter(user=request.user) \
                     .count() >= self.max_entries_per_user:
                     return False, 'max_entries'
-                else
+                else:
                     return True, 'can_enter'
         else:
             return False, 'auth_required'
