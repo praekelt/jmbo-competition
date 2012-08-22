@@ -32,6 +32,8 @@ class Competition(ModelBase):
             ('multiple_choice_selection', 'Multiple choice selection'),
         ),
         default='free_text_input',
+        blank=True,
+        null=True,
     )
     correct_answer = models.CharField(
         max_length=255,
@@ -44,18 +46,14 @@ class Competition(ModelBase):
         null=True,
         help_text="Rules specific to this competition.",
     )
-    max_entries_per_user = models.IntegerField(
-        default=1
-    )
     start_date = models.DateField(
-        blank=True,
-        null=True,
         help_text="Date the competition starts."
     )
     end_date = models.DateField(
-        blank=True,
-        null=True,
         help_text="Date the competition ends."
+    )
+    max_entries_per_user = models.IntegerField(
+        default=1
     )
 
     class Meta:

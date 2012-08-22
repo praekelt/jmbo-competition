@@ -47,7 +47,7 @@ class CompetitionAnswerOptionAdmin(admin.StackedInline):
 class CompetitionAdmin(ModelBaseAdmin):
     inlines = (CompetitionAnswerOptionAdmin, )
     form = CompetitionAdminForm
-    list_display = ('title', 'start_date', 'end_date', '_entries', '_get_absolute_url', '_actions')
+    list_display = ('title', 'start_date', 'end_date', 'description', '_entries', '_get_absolute_url', '_actions')
 
     def __init__(self, *args, **kwargs):
         super(CompetitionAdmin, self).__init__(*args, **kwargs)
@@ -65,8 +65,7 @@ class CompetitionAdmin(ModelBaseAdmin):
         self.fieldsets[0][1]['fields'] += one_liners
         
         question_fieldset = (('Competition question', {
-            'fields': ('question', 'question_blurb', 'correct_answer'),
-            'classes': ('collapse', )
+            'fields': ('question', 'question_blurb', 'answer_type', 'correct_answer',),
             }), )
         for field in question_fieldset[0][1]['fields']:
             try:
