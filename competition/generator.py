@@ -2,6 +2,7 @@ import random
 from datetime import date, timedelta
 
 from django.conf import settings
+from django.utils import timezone
 
 from generate import IMAGES
 from generate.json_loader import load_json
@@ -15,7 +16,7 @@ def generate():
 
     # create event, venue and location objects
     for i in range(1, COMPETITION_COUNT + 1):
-        start_date = date.today() + timedelta(days=random.randint(1, 30))
+        start_date = timezone.now().date() + timedelta(days=random.randint(1, 30))
         end_date = start_date + timedelta(days=random.randint(1, 60))
         objects.append({
             "model": "competition.Competition",
