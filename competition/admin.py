@@ -47,6 +47,7 @@ class CompetitionAnswerOptionAdmin(admin.StackedInline):
 class CompetitionAdmin(ModelBaseAdmin):
     inlines = (CompetitionAnswerOptionAdmin, )
     form = CompetitionAdminForm
+    list_display = ('title', 'start_date', 'end_date', '_entries', '_get_absolute_url', '_actions')
 
     def __init__(self, *args, **kwargs):
         super(CompetitionAdmin, self).__init__(*args, **kwargs)
@@ -76,6 +77,10 @@ class CompetitionAdmin(ModelBaseAdmin):
             except:
                 continue
         self.fieldsets = self.fieldsets[0:1] + question_fieldset + self.fieldsets[1:]
+
+    def _entries(self, obj):
+        return CompetitionEntry.objects.filter(competition=obj).count()
+    _entries.short_description = 'No. entries'
 
     
 admin.site.register(Competition, CompetitionAdmin)
