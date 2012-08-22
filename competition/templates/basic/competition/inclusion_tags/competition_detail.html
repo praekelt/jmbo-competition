@@ -1,4 +1,4 @@
-{% load i18n jmbo_template_tags %}
+{% load i18n jmbo_template_tags humanize %}
 
 <div class="object-detail-inclusion {{ object.class_name.lower }}-detail-inclusion">
     {% if object.image %}
@@ -6,23 +6,47 @@
     {% endif %}
     {{ object.content|safe }}
 
-    {% if object.question %}
-        <div class="title">{{ object.question }}</div>
-        {{ object.question_blurb|safe }}
-    {% endif %}
-
-    <form action="{% url competition-detail object.slug %}" method="POST">
-        {% csrf_token %}
-        {{ competition_entry_form.as_div }}
-        <div class="buttons">
-            <input type="submit" value="{% trans "Enter" %}" />
-        </div>
-    </form>
-
-    {% if object.rules %}
-        <div class="rules">
-            <div class="title">{% trans "Competition rules" %}</div>
-            {{ object.rules|safe }}
-        </div>
+    {% if can_enter %}
+        <form action="{% url competition-detail object.slug %}" method="POST">
+            {% if object.question %}
+                <div class="title question">{{ object.question }}</div>
+                {% if object.question_blurb %}{{ object.question_blurb|safe }}{% endif %}
+            {% endif %}
+            {% csrf_token %}
+            {% for field in competition_entry_form %}
+                {% if field.name == "accept_terms" %}
+                    <div class="field">{{ field.errors }} {{ field }} 
+                        {% url competition-terms object.slug as terms_url %}
+                        {% blocktrans %}I accept the <a href="{{ terms_url }}">terms</a> of this competition{% endblocktrans %}
+                   </div>
+                {% else %}
+                    <div class="field">
+                        <div class="required">{{ field.label_tag }} {{ field.errors }}
+                            <div class="helptext">{{ field.helptext }}</div>
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="buttons">
+                <input type="submit" value="{% trans "Enter" %}" />
+            </div>
+        </form>
+    {% else %}
+        <p class="reason">
+            {% if reason == 'auth_required' %}
+                <a href="{% url login %}">{% trans "You must be signed in to vote" %}</a>.
+            {% else %}
+                {% if reason == 'max_entries' %}
+                    {% trans "You have entered this competition the maximum number of times" %}.
+                {% else %}
+                    {% if reason == 'ended' %}
+                        {% trans "The competition is closed" %}.
+                    {% else %}
+                        {% trans "The competition opens" %} {{ object.start_date|naturalday:"D d N 'y" }}.
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </p>
     {% endif %}
 </div>

@@ -1,9 +1,8 @@
-from datetime import datetime, date
-
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 
 from jmbo.models import ModelBase
 
@@ -25,6 +24,14 @@ class Competition(ModelBase):
         blank=True,
         null=True,
         help_text="Descriptive text elaborating on the question."
+    )
+    answer_type = models.CharField(
+        max_length=32,
+        choices=(
+            ('free_text_input', 'Free text input'),
+            ('multiple_choice_selection', 'Multiple choice selection'),
+        ),
+        default='free_text_input',
     )
     correct_answer = models.CharField(
         max_length=255,
@@ -65,14 +72,14 @@ class Competition(ModelBase):
 
     def can_enter(self, request):
         if request.user.is_authenticated():
-            current_date = date.today()
+            current_date = timezone.now().date()
             if current_date < self.start_date:
                 return False, 'not_started'
             elif current_date > self.end_date:
                 return False, 'ended'
             else:
-                if CompetitionEntry.objects.filter(user=request.user) \
-                    .count() >= self.max_entries_per_user:
+                if CompetitionEntry.objects.filter(user=request.user, \
+                    competition=self).count() >= self.max_entries_per_user:
                     return False, 'max_entries'
                 else:
                     return True, 'can_enter'
@@ -95,7 +102,7 @@ class CompetitionAnswerOption(models.Model):
     )
     
     def __unicode__(self):
-        return "%s - %s" % (self.competition.title, self.text)
+        return self.text
 
 
 class CompetitionEntry(models.Model):

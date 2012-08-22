@@ -2,17 +2,26 @@ from django import forms
 from django.forms.widgets import RadioSelect
 from django.utils.translation import ugettext_lazy as _
 
+from django.core.urlresolvers import reverse
+
 from jmbo.forms import as_div
 
 from competition.models import CompetitionEntry
 
 
 class CompetitionBaseEntryForm(forms.Form):
-    
+    accept_terms = forms.BooleanField(
+        required=True,
+        label="",
+    )
+
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         self.competition = kwargs.pop('competition')
         super(CompetitionBaseEntryForm, self).__init__(*args, **kwargs)
+        # put accept_terms checkbox after all other fields
+        self.fields.keyOrder.remove('accept_terms')
+        self.fields.keyOrder.append('accept_terms')
 
     def clean(self):
         if not self.competition.can_enter(self.request):
@@ -44,7 +53,7 @@ class MultichoiceEntryForm(CompetitionBaseEntryForm):
         required=True
     )
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super(MultichoiceEntryForm, self).__init__(*args, **kwargs)
         self.fields['option'].choices = \
             [(o.id, o.text) for o in self.competition.competitionansweroption_set.all()]
