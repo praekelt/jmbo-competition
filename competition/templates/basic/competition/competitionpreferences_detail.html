@@ -2,10 +2,14 @@
 {% load jmbo_inclusion_tags %} 
 
 {% block content %}
-    <div class="page section_competition object-detail competition-preferences-detail">
-        <div class="title">{{ title }}</div>
+    <div class="page section_competition object-detail {{ object.class_name.lower }}-detail">
 
-        {% view_modifier view_modifier %}
+        {% if view_modifier %}
+            <div class="title">
+                {{ title }}
+            </div>      
+            {% view_modifier view_modifier %}
+        {% endif %}
 
         <div class="rules">
             {{ object.rules|safe }}

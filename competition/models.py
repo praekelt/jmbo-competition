@@ -51,6 +51,9 @@ class Competition(ModelBase):
         help_text="Date the competition ends."
     )
 
+    class Meta:
+        ordering = ['end_date', 'start_date']
+
     def __init__(self, *args, **kwargs):
         super(Competition, self).__init__(*args, **kwargs)
         # split list of correct answers and remove leading/trailing spaces

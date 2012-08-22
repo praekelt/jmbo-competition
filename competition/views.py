@@ -12,9 +12,9 @@ from competition.view_modifiers import CompetitionViewModifier
 from competition.forms import SingleAnswerEntryForm, MultichoiceEntryForm
 
 
-class ObjectList(GenericObjectList):
+'''class ObjectList(GenericObjectList):
     def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions'}
+        return {'title': _('Competitions')}
 
     def get_view_modifier(self, request, *args, **kwargs):
         return CompetitionViewModifier(request=request, slug=None)
@@ -25,15 +25,15 @@ class ObjectList(GenericObjectList):
     def get_queryset(self, *args, **kwargs):
         return Competition.permitted.all().order_by('start_date')
 
-object_list = ObjectList()
+object_list = ObjectList()'''
 
 
 class PreferencesInfo(GenericObjectDetail):
     def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions'}
+        return {'title': _('Competitions')}
 
-    def get_view_modifier(self, request, *args, **kwargs):
-        return CompetitionViewModifier(request=request, slug=None)
+    '''def get_view_modifier(self, request, *args, **kwargs):
+        return CompetitionViewModifier(request=request, slug=None)'''
 
     def get_queryset(self, *args, **kwargs):
         return CompetitionPreferences.objects.all()
@@ -67,6 +67,6 @@ def competition_detail(request, slug):
     
     extra = {"competition_entry_form": form, "object": competition,
         "view_modifier": CompetitionViewModifier(request=request, slug=None)}
-    return render_to_response("competition/competition_detail.html", extra,
+    return render_to_response("jmbo/modelbase_detail.html", extra,
         context_instance=RequestContext(request))
 
