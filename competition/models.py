@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -13,7 +15,13 @@ from ckeditor.fields import RichTextField
 
 # This model tries to encapsulate the most common forms a competition can take
 class Competition(ModelBase):
-    content = RichTextField()
+    content = RichTextField(
+        help_text="Background info and explanation of the competition."
+    )
+    check_in_to_enter = models.BooleanField(
+        default=False,
+        help_text="Tick this if the user should be near a specific location to enter the competition.",
+    )
     question = models.CharField(
         blank=True,
         null=True,
@@ -30,16 +38,22 @@ class Competition(ModelBase):
         choices=(
             ('free_text_input', 'Free text input'),
             ('multiple_choice_selection', 'Multiple choice selection'),
+            ('file_upload', 'File upload')
         ),
-        default='free_text_input',
         blank=True,
         null=True,
+        help_text="What type of answer is expected of the user, if any?",
     )
     correct_answer = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        help_text="Answer used to determine winning entries. If there are multiple correct answers, enter a comma-separated list (not case-sensitive). If multichoice answers are required, see answer options below."
+        help_text="Answer used to determine winning entries. If there are multiple correct answers, enter a comma-separated list. <b>(only for answer type 'Free text input')</b>"
+    )
+    max_file_size = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="The maximum size in kB for a file upload.  <b>(only for answer type 'File upload')</b>"
     )
     rules = RichTextField(
         blank=True,
@@ -53,7 +67,8 @@ class Competition(ModelBase):
         help_text="Date the competition ends."
     )
     max_entries_per_user = models.IntegerField(
-        default=1
+        default=1,
+        help_text="Maximum number of times a user can enter the competition.",
     )
 
     class Meta:
@@ -90,7 +105,10 @@ class Competition(ModelBase):
 
 # An option in a multichoice answer set
 class CompetitionAnswerOption(models.Model):
-    text = models.CharField(max_length=255)
+    text = models.CharField(
+        max_length=255,
+        help_text="The option text shown to the user. <b>(only for answer type 'Multiple choice selection')</b>"
+    )
     competition = models.ForeignKey(
         Competition
     )
@@ -102,6 +120,10 @@ class CompetitionAnswerOption(models.Model):
     def __unicode__(self):
         return self.text
 
+
+def get_file_upload_path(instance, filename):        
+    return "competition/%s/%d%s" % (instance.competition.slug, \
+        instance.user.id, os.path.splitext(filename))
 
 class CompetitionEntry(models.Model):
     competition = models.ForeignKey(
@@ -119,6 +141,11 @@ class CompetitionEntry(models.Model):
     )
     answer_option = models.ForeignKey(
         CompetitionAnswerOption,
+        null=True,
+        blank=True
+    )
+    answer_file = models.FileField(
+        upload_to=get_file_upload_path,
         null=True,
         blank=True
     )
@@ -141,8 +168,14 @@ class CompetitionEntry(models.Model):
         return False
 
     def __unicode__(self):
-        return "%s answered %s" % (self.user.username,
-            self.answer_text if self.answer_text else self.answer_option)
+        if self.competition.answer_type:
+            if self.competition.answer_type != 'file_upload':
+                return "%s answered %s" % (self.user.username,
+                    self.answer_text if self.answer_text else self.answer_option.__unicode__())
+            else:
+                return "%s uploaded a file" % (self.user.username, )
+        else:
+            return self.user.__unicode__()
 
 
 class CompetitionPreferences(Preferences):

@@ -25,9 +25,16 @@ class CompetitionBaseEntryForm(forms.Form):
 
     def clean(self):
         if not self.competition.can_enter(self.request):
-            raise forms.ValidationError(_("You are not allowed to vote on this poll."))
+            raise forms.ValidationError(_("You are not allowed to enter this competition."))
         return super(CompetitionBaseEntryForm, self).clean()
-    
+
+    def save(self):
+        entry = CompetitionEntry(
+            user=self.request.user,
+            competition=self.competition,
+        )
+        entry.save()
+
     as_div = as_div
 
 
@@ -65,5 +72,23 @@ class MultichoiceEntryForm(CompetitionBaseEntryForm):
             answer_option_id=self.cleaned_data['option']
         )
         entry.save()
-    
-    
+
+
+class FileUploadEntryForm(CompetitionBaseEntryForm):
+    file = forms.FileField(
+        required=True
+    )
+
+    def clean_file(self):
+        if self.cleaned_data['file'].size > self.competition.max_file_size * 1024:
+            raise forms.ValidationError(_("The file is too large. It may not be larger than %d kB." \
+                % self.competition.max_file_size))
+        return self.cleaned_data
+
+    def save(self):
+        entry = CompetitionEntry(
+            user=self.request.user,
+            competition=self.competition,
+            answer_file=self.cleaned_data['file']
+        )
+        entry.save()

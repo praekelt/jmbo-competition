@@ -7,7 +7,11 @@
     {{ object.content|safe }}
 
     {% if can_enter %}
-        <form action="{% url competition-detail object.slug %}" method="POST">
+        {% if competition_entry_form.is_multipart %}
+            <form enctype="multipart/form-data" action="{% url competition-detail object.slug %}" method="POST">
+        {% else %}
+            <form action="{% url competition-detail object.slug %}" method="POST">
+        {% endif %}
             {% if object.question %}
                 <div class="title question">{{ object.question }}</div>
                 {% if object.question_blurb %}{{ object.question_blurb|safe }}{% endif %}

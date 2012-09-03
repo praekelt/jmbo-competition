@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 
 from competition.models import Competition, CompetitionPreferences
-from competition.forms import SingleAnswerEntryForm, MultichoiceEntryForm
+from competition.forms import CompetitionBaseEntryForm, \
+    SingleAnswerEntryForm, MultichoiceEntryForm, FileUploadEntryForm
 
 
 def competition_terms(request, slug):
@@ -21,10 +22,19 @@ def competition_terms(request, slug):
 
 def competition_detail(request, slug):
     competition = get_object_or_404(Competition, slug=slug)
-    form_class = SingleAnswerEntryForm if competition.answer_type \
-        == 'free_text_input' else MultichoiceEntryForm
+    # determine which form to use for the competition
+    if competition.question and competition.answer_type:
+        if competition.answer_type == 'free_text_input':
+            form_class = SingleAnswerEntryForm
+        elif competition.answer_type == 'multiple_choice_selection':
+            form_class = MultichoiceEntryForm
+        else:
+            form_class = FileUploadEntryForm
+    else:
+        form_class = CompetitionBaseEntryForm
+
     if request.method == 'POST':
-        form = form_class(request.POST,
+        form = form_class(request.POST, request.FILES,
             request=request, competition=competition)
         if form.is_valid():
             form.save()
