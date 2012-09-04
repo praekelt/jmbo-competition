@@ -125,7 +125,7 @@ class CompetitionAnswerOption(models.Model):
 
 def get_file_upload_path(instance, filename):        
     return "competition/%s/%d%s" % (instance.competition.slug, \
-        instance.user.id, os.path.splitext(filename))
+        instance.user.id, os.path.splitext(filename)[1])
 
 class CompetitionEntry(models.Model):
     competition = models.ForeignKey(
@@ -161,23 +161,29 @@ class CompetitionEntry(models.Model):
         verbose_name_plural = "Competition entries"
 
     def has_correct_answer(self):
-        if self.answer_text and self.competition.correct_answer:
-            for answer in self.competition.correct_answer_list:
-                if self.answer_text.lower() == answer.lower():
-                    return True
-        elif self.answer_option:
-            return self.answer_option.is_correct_answer
-        return False
+        if self.competition.answer_type and self.competition.answer_type != 'file_upload':
+            if self.competition.answer_type == 'free_text_input':
+                if self.competition.correct_answer:
+                    a = self.answer_text.lower() if self.answer_text else ''
+                    for answer in self.competition.correct_answer_list:
+                        if a == answer.lower():
+                            return True
+                    return False
+                return True
+            else:
+                return self.answer_option.is_correct_answer
+        return True  # unless an answer is explicitly wrong, don't return False
+    has_correct_answer.short_description = "Correct/valid entry"
 
     def __unicode__(self):
         if self.competition.answer_type:
             if self.competition.answer_type != 'file_upload':
-                return "%s answered %s" % (self.user.username,
-                    self.answer_text if self.answer_text else self.answer_option.__unicode__())
+                return "Entry %d answered '%s'" % (self.id,
+                    self.answer_text if self.answer_text else self.answer_option)
             else:
-                return "%s uploaded a file" % (self.user.username, )
+                return "Entry %d uploaded a file" % (self.id, )
         else:
-            return self.user.__unicode__()
+            return "Entry %d" % self.id
 
 
 class CompetitionPreferences(Preferences):

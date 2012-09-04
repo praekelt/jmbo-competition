@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin import BooleanFieldListFilter
+from django.core.urlresolvers import reverse
 
 from preferences.admin import PreferencesAdmin
 
@@ -106,8 +108,25 @@ class CompetitionAdmin(ModelBaseAdmin):
     _entries.short_description = 'No. entries'
 
 
+# mark a competition entry as a winner
+def mark_winner(modeladmin, request, queryset):
+    queryset.update(winner=True)
+mark_winner.short_description = "Mark selected entries as winners"
+
 class CompetitionEntryAdmin(admin.ModelAdmin):
-    list_filter = ('competition', )
+    list_display = ('__unicode__', 'user_link', 'has_correct_answer', 'file_link', 'winner')
+    list_filter = ('competition', 'winner')
+    actions = [mark_winner]
+
+    def user_link(self, obj):
+        return '<a href="%s">%s</a>' % (reverse('admin:foundry_member_change', args=(obj.user.id, )), obj.user.__unicode__())
+    user_link.allow_tags = True
+    
+    def file_link(self, obj):
+        if obj.competition.answer_type == 'file_upload':
+            return '<a href="%s">Download file</a>' % (obj.answer_file.url, )
+        return ''
+    file_link.allow_tags = True
 
 
 admin.site.register(Competition, CompetitionAdmin)
