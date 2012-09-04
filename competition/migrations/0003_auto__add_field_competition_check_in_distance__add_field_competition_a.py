@@ -13,11 +13,27 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.PositiveIntegerField')(default=0, null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'Competition.answer_type'
+        db.add_column('competition_competition', 'answer_type',
+                      self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'Competition.max_file_size'
         db.add_column('competition_competition', 'max_file_size',
                       self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'Competition.max_entries_per_user'
+        db.add_column('competition_competition', 'max_entries_per_user',
+                      self.gf('django.db.models.fields.IntegerField')(default=1),
+                      keep_default=False)
+
+
+        # Changing field 'Competition.end_date'
+        db.alter_column('competition_competition', 'end_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2012, 9, 4, 0, 0)))
+
+        # Changing field 'Competition.start_date'
+        db.alter_column('competition_competition', 'start_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2012, 9, 4, 0, 0)))
         # Adding field 'CompetitionEntry.answer_file'
         db.add_column('competition_competitionentry', 'answer_file',
                       self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True),
@@ -28,9 +44,21 @@ class Migration(SchemaMigration):
         # Deleting field 'Competition.check_in_distance'
         db.delete_column('competition_competition', 'check_in_distance')
 
+        # Deleting field 'Competition.answer_type'
+        db.delete_column('competition_competition', 'answer_type')
+
         # Deleting field 'Competition.max_file_size'
         db.delete_column('competition_competition', 'max_file_size')
 
+        # Deleting field 'Competition.max_entries_per_user'
+        db.delete_column('competition_competition', 'max_entries_per_user')
+
+
+        # Changing field 'Competition.end_date'
+        db.alter_column('competition_competition', 'end_date', self.gf('django.db.models.fields.DateField')(null=True))
+
+        # Changing field 'Competition.start_date'
+        db.alter_column('competition_competition', 'start_date', self.gf('django.db.models.fields.DateField')(null=True))
         # Deleting field 'CompetitionEntry.answer_file'
         db.delete_column('competition_competitionentry', 'answer_file')
 
