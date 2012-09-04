@@ -1,6 +1,7 @@
 from django import forms
 from django.forms.widgets import RadioSelect
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.gis.geos import fromstr, LineString
 
 from django.core.urlresolvers import reverse
 
@@ -14,6 +15,10 @@ class CompetitionBaseEntryForm(forms.Form):
         required=True,
         label="",
     )
+    location = forms.CharField(
+        widget=forms.HiddenInput,
+        required=True,
+    )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
@@ -22,11 +27,23 @@ class CompetitionBaseEntryForm(forms.Form):
         # put accept_terms checkbox after all other fields
         self.fields.keyOrder.remove('accept_terms')
         self.fields.keyOrder.append('accept_terms')
+        if not self.competition.check_in_distance:
+            del self.fields['location']
 
     def clean(self):
         if not self.competition.can_enter(self.request):
             raise forms.ValidationError(_("You are not allowed to enter this competition."))
         return super(CompetitionBaseEntryForm, self).clean()
+    
+    def clean_location(self):
+        p = fromstr(self.cleaned_data['location'])
+        line = LineString(p, self.competition.location.coordinates, srid=4326)
+        line.transform(53031)
+        if line.length > self.competition.check_in_distance:
+            raise forms.ValidationError(_("""You are not close enough to 
+                enter the competition, or you GPS might not be turned on. In the latter 
+                case, turn on your device's GPS and reload the page."""))
+        return self.cleaned_data['location']
 
     def save(self):
         entry = CompetitionEntry(

@@ -17,7 +17,7 @@
                 {% if object.question_blurb %}{{ object.question_blurb|safe }}{% endif %}
             {% endif %}
             {% csrf_token %}
-            {% for field in competition_entry_form %}
+            {% for field in competition_entry_form.visible_fields %}
                 {% if field.name == "accept_terms" %}
                     <div class="field">{{ field.errors }} {{ field }} 
                         {% url competition-terms object.slug as terms_url %}
@@ -32,6 +32,7 @@
                     </div>
                 {% endif %}
             {% endfor %}
+            {% for field in competition_entry_form.hidden_fields %}{{ field }}{% endfor %}
             <div class="buttons">
                 <input type="submit" value="{% trans "Submit entry" %}" />
             </div>
@@ -52,7 +53,8 @@
                         $("img.loading", container).hide();
                         if (dist <= {{ object.check_in_distance }}) {
                             $(container).hide();
-                            $(".competition-detail-inclusion form").show();
+                            $(".competition-detail-inclusion form").show()
+                                .children("#id_location").val("POINT (" + xb + " " + yb + ")");
                         }
                         else
                             $("#location-loading-text", container)
