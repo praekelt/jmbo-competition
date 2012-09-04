@@ -58,6 +58,9 @@ class CompetitionAdminForm(ModelBaseAdminForm):
         # check that an answer type has been specified if there is a question
         if not at and cleaned_data['question']:
             raise forms.ValidationError(_("You need to specify an answer type for the question."))
+        # check that a distance threshold has been set if check in is enabled
+        if cleaned_data['check_in_to_enter'] and not cleaned_data['check_in_distance']:
+            raise forms.ValidationError(_("You need to specify a check in distance threshold if 'Check in to enter' is enabled."))
         return cleaned_data
 
 

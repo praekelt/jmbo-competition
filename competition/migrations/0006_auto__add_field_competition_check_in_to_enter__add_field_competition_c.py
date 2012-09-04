@@ -13,6 +13,11 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
+        # Adding field 'Competition.check_in_distance'
+        db.add_column('competition_competition', 'check_in_distance',
+                      self.gf('django.db.models.fields.PositiveIntegerField')(default=1000, null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'Competition.max_file_size'
         db.add_column('competition_competition', 'max_file_size',
                       self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True),
@@ -27,6 +32,9 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting field 'Competition.check_in_to_enter'
         db.delete_column('competition_competition', 'check_in_to_enter')
+
+        # Deleting field 'Competition.check_in_distance'
+        db.delete_column('competition_competition', 'check_in_distance')
 
         # Deleting field 'Competition.max_file_size'
         db.delete_column('competition_competition', 'max_file_size')
@@ -117,7 +125,8 @@ class Migration(SchemaMigration):
         },
         'competition.competition': {
             'Meta': {'ordering': "['end_date', 'start_date']", 'object_name': 'Competition', '_ormbases': ['jmbo.ModelBase']},
-            'answer_type': ('django.db.models.fields.CharField', [], {'default': "'free_text_input'", 'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'check_in_distance': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1000', 'null': 'True', 'blank': 'True'}),
             'check_in_to_enter': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'content': ('ckeditor.fields.RichTextField', [], {}),
             'correct_answer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
