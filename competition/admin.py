@@ -105,7 +105,11 @@ class CompetitionAdmin(ModelBaseAdmin):
         return CompetitionEntry.objects.filter(competition=obj).count()
     _entries.short_description = 'No. entries'
 
-    
+
+class CompetitionEntryAdmin(admin.ModelAdmin):
+    list_filter = ('competition', )
+
+
 admin.site.register(Competition, CompetitionAdmin)
-admin.site.register(CompetitionEntry)
+admin.site.register(CompetitionEntry, CompetitionEntryAdmin)
 admin.site.register(CompetitionPreferences, PreferencesAdmin)
