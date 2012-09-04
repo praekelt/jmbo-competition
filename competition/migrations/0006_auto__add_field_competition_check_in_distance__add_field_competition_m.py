@@ -8,14 +8,9 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Competition.check_in_to_enter'
-        db.add_column('competition_competition', 'check_in_to_enter',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
-
         # Adding field 'Competition.check_in_distance'
         db.add_column('competition_competition', 'check_in_distance',
-                      self.gf('django.db.models.fields.PositiveIntegerField')(default=1000, null=True, blank=True),
+                      self.gf('django.db.models.fields.PositiveIntegerField')(default=0, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'Competition.max_file_size'
@@ -30,9 +25,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting field 'Competition.check_in_to_enter'
-        db.delete_column('competition_competition', 'check_in_to_enter')
-
         # Deleting field 'Competition.check_in_distance'
         db.delete_column('competition_competition', 'check_in_distance')
 
@@ -126,8 +118,7 @@ class Migration(SchemaMigration):
         'competition.competition': {
             'Meta': {'ordering': "['end_date', 'start_date']", 'object_name': 'Competition', '_ormbases': ['jmbo.ModelBase']},
             'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
-            'check_in_distance': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1000', 'null': 'True', 'blank': 'True'}),
-            'check_in_to_enter': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'check_in_distance': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'content': ('ckeditor.fields.RichTextField', [], {}),
             'correct_answer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'end_date': ('django.db.models.fields.DateField', [], {}),

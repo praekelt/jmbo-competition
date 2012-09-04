@@ -83,7 +83,7 @@ class FileUploadEntryForm(CompetitionBaseEntryForm):
         if self.cleaned_data['file'].size > self.competition.max_file_size * 1024:
             raise forms.ValidationError(_("The file is too large. It may not be larger than %d kB." \
                 % self.competition.max_file_size))
-        return self.cleaned_data
+        return self.cleaned_data['file']
 
     def save(self):
         entry = CompetitionEntry(

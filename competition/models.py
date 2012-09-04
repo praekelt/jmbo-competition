@@ -18,13 +18,9 @@ class Competition(ModelBase):
     content = RichTextField(
         help_text="Background info and explanation of the competition."
     )
-    check_in_to_enter = models.BooleanField(
-        default=False,
-        help_text="Tick this if the user should be near a specific location to enter the competition.",
-    )
     check_in_distance = models.PositiveIntegerField(
-        default=1000,
-        help_text="Distance threshold for check ins, in metres.",
+        default=0,
+        help_text="Distance threshold for check ins, in metres. 0 to disable checking in to enter.",
         blank=True,
         null=True,
     )

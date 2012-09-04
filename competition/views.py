@@ -9,7 +9,7 @@ from competition.forms import CompetitionBaseEntryForm, \
 
 
 def competition_terms(request, slug):
-    competition = get_object_or_404(Competition, slug=slug)
+    competition = get_object_or_404(Competition.permitted, slug=slug)
     extra = {"title": _("Competition terms"), "competition": competition}
     preferences = CompetitionPreferences.objects.all()
     if preferences:
@@ -21,7 +21,7 @@ def competition_terms(request, slug):
 
 
 def competition_detail(request, slug):
-    competition = get_object_or_404(Competition, slug=slug)
+    competition = get_object_or_404(Competition.permitted, slug=slug)
     # determine which form to use for the competition
     if competition.question and competition.answer_type:
         if competition.answer_type == 'free_text_input':

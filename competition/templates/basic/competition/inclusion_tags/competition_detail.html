@@ -39,7 +39,7 @@
     {% else %}
         <p class="reason">
             {% if reason == 'auth_required' %}
-                <a href="{% url login %}">{% trans "You must be signed in to vote" %}</a>.
+                <a href="{% url login %}">{% trans "You must be signed in to enter" %}</a>.
             {% else %}
                 {% if reason == 'max_entries' %}
                     {% trans "You have entered this competition the maximum number of times" %}.
