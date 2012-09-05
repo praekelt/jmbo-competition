@@ -12,6 +12,7 @@ setup(
     packages = find_packages(),
     install_requires = [
         'jmbo',
+        'jmbo-foundry',
         'django-ckeditor',
     ],
     tests_require=[

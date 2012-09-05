@@ -37,8 +37,8 @@ class CompetitionBaseEntryForm(forms.Form):
     
     def clean_location(self):
         p = fromstr(self.cleaned_data['location'])
-        line = LineString(p, self.competition.location.coordinates, srid=4326)
-        line.transform(53031)
+        line = LineString(p, self.competition.location.coordinates, srid=4326) # lon/lat (srid=4326)
+        line.transform(53031) # transform to two-point equidistant projection (srid=53031)
         if line.length > self.competition.check_in_distance:
             raise forms.ValidationError(_("""You are not close enough to 
                 enter the competition, or you GPS might not be turned on. In the latter 
