@@ -124,8 +124,9 @@ class CompetitionAnswerOption(models.Model):
 
 
 def get_file_upload_path(instance, filename):        
-    return "competition/%s/%d%s" % (instance.competition.slug, \
-        instance.user.id, os.path.splitext(filename)[1])
+    return "competition/%s/%d_%s%s" % (instance.competition.slug, \
+        instance.user.id, timezone.now().strftime('%d-%m-%y %H:%M:%S.%f'), \
+        os.path.splitext(filename)[1])
 
 class CompetitionEntry(models.Model):
     competition = models.ForeignKey(
