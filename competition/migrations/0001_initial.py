@@ -9,7 +9,6 @@ class Migration(SchemaMigration):
 
     depends_on = (
         ("foundry", "0001_initial"),
-        ("atlas", "0005_auto__add_field_country_coordinates__add_field_region_coordinates"),
     )
 
     def forwards(self, orm):
