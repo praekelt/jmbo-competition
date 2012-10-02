@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% comment %}
+Copy of jmbo/templates/jmbo/modelbase_detail.html. render_object replaced since
+the can_enter variable needs to be set.
+{% endcomment %}
+
+{% load jmbo_inclusion_tags competition_tags %} 
+
+{% block content %}
+    <div class="page section_news object-detail {{ object.class_name.lower }}-detail">
+
+        {% if view_modifier %}
+            <div class="title">
+                {{ title }}
+            </div>      
+            {% view_modifier view_modifier %}
+        {% endif %}
+
+        {% object_header object %}
+
+        {% competition_detail object %}
+
+        {% object_comments object %}
+
+        </div><!--/page-->
+{% endblock %}
