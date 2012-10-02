@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% comment %}
+This template displays a competition's rules - general rules and rules specific to a competition.
+{% endcomment %} 
+
+{% block content %}
+    <div class="page section_competition_terms">
+
+        <div class="title">{{ title }}</div>      
+      
+        <div class="rules">
+            <div class="competition-rules">{{ competition.rules|safe }}</div>
+            <div class="general-rules">{{ preferences.rules|safe }}</div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -7,45 +7,99 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    depends_on = (
-        ("foundry", "0001_initial"),
-    )
-
     def forwards(self, orm):
-        # Adding model 'Competition'
-        db.create_table('competition_competition', (
-            ('modelbase_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['jmbo.ModelBase'], unique=True, primary_key=True)),
-            ('content', self.gf('ckeditor.fields.RichTextField')()),
-            ('start_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('question', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('question_blurb', self.gf('ckeditor.fields.RichTextField')(null=True, blank=True)),
-            ('correct_answer', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('rules', self.gf('ckeditor.fields.RichTextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('competition', ['Competition'])
+        # Adding field 'Competition.check_in_distance'
+        db.add_column('competition_competition', 'check_in_distance',
+                      self.gf('django.db.models.fields.PositiveIntegerField')(default=0, null=True, blank=True),
+                      keep_default=False)
 
-        # Adding model 'CompetitionEntry'
-        db.create_table('competition_competitionentry', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('competition', self.gf('django.db.models.fields.related.ForeignKey')(related_name='competition_entries', to=orm['competition.Competition'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='competition_entries_users', to=orm['auth.User'])),
-            ('answer', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('winner', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('competition', ['CompetitionEntry'])
+        # Adding field 'Competition.answer_type'
+        db.add_column('competition_competition', 'answer_type',
+                      self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Competition.max_file_size'
+        db.add_column('competition_competition', 'max_file_size',
+                      self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Competition.max_entries_per_user'
+        db.add_column('competition_competition', 'max_entries_per_user',
+                      self.gf('django.db.models.fields.IntegerField')(default=1),
+                      keep_default=False)
+
+
+        # Changing field 'Competition.end_date'
+        db.alter_column('competition_competition', 'end_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2012, 9, 4, 0, 0)))
+
+        # Changing field 'Competition.start_date'
+        db.alter_column('competition_competition', 'start_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2012, 9, 4, 0, 0)))
+        # Adding field 'CompetitionEntry.answer_file'
+        db.add_column('competition_competitionentry', 'answer_file',
+                      self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Competition'
-        db.delete_table('competition_competition')
+        # Deleting field 'Competition.check_in_distance'
+        db.delete_column('competition_competition', 'check_in_distance')
 
-        # Deleting model 'CompetitionEntry'
-        db.delete_table('competition_competitionentry')
+        # Deleting field 'Competition.answer_type'
+        db.delete_column('competition_competition', 'answer_type')
+
+        # Deleting field 'Competition.max_file_size'
+        db.delete_column('competition_competition', 'max_file_size')
+
+        # Deleting field 'Competition.max_entries_per_user'
+        db.delete_column('competition_competition', 'max_entries_per_user')
+
+
+        # Changing field 'Competition.end_date'
+        db.alter_column('competition_competition', 'end_date', self.gf('django.db.models.fields.DateField')(null=True))
+
+        # Changing field 'Competition.start_date'
+        db.alter_column('competition_competition', 'start_date', self.gf('django.db.models.fields.DateField')(null=True))
+        # Deleting field 'CompetitionEntry.answer_file'
+        db.delete_column('competition_competitionentry', 'answer_file')
 
 
     models = {
+        'atlas.city': {
+            'Meta': {'ordering': "('name',)", 'object_name': 'City'},
+            'coordinates': ('atlas.fields.CoordinateField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.Country']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'region': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.Region']", 'null': 'True', 'blank': 'True'})
+        },
+        'atlas.country': {
+            'Meta': {'ordering': "('name',)", 'object_name': 'Country'},
+            'border': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'coordinates': ('atlas.fields.CoordinateField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'country_code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '2', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        'atlas.location': {
+            'Meta': {'object_name': 'Location'},
+            'address': ('django.db.models.fields.TextField', [], {'max_length': '512', 'null': 'True', 'blank': 'True'}),
+            'city': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.City']"}),
+            'coordinates': ('atlas.fields.CoordinateField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.Country']"}),
+            'description': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'photo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['photologue.Photo']", 'null': 'True', 'blank': 'True'})
+        },
+        'atlas.region': {
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('country', 'code'),)", 'object_name': 'Region'},
+            'border': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '2', 'db_index': 'True'}),
+            'coordinates': ('atlas.fields.CoordinateField', [], {'blank': 'True', 'null': 'True', 'geography': 'True'}),
+            'country': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.Country']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'})
+        },
         'auth.group': {
             'Meta': {'object_name': 'Group'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -90,19 +144,32 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         'competition.competition': {
-            'Meta': {'ordering': "('-created',)", 'object_name': 'Competition', '_ormbases': ['jmbo.ModelBase']},
+            'Meta': {'ordering': "['end_date', 'start_date']", 'object_name': 'Competition', '_ormbases': ['jmbo.ModelBase']},
+            'answer_type': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'check_in_distance': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'content': ('ckeditor.fields.RichTextField', [], {}),
             'correct_answer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'end_date': ('django.db.models.fields.DateField', [], {}),
+            'max_entries_per_user': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
+            'max_file_size': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'modelbase_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['jmbo.ModelBase']", 'unique': 'True', 'primary_key': 'True'}),
             'question': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'question_blurb': ('ckeditor.fields.RichTextField', [], {'null': 'True', 'blank': 'True'}),
             'rules': ('ckeditor.fields.RichTextField', [], {'null': 'True', 'blank': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'})
+            'start_date': ('django.db.models.fields.DateField', [], {})
+        },
+        'competition.competitionansweroption': {
+            'Meta': {'object_name': 'CompetitionAnswerOption'},
+            'competition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['competition.Competition']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_correct_answer': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'text': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'competition.competitionentry': {
             'Meta': {'object_name': 'CompetitionEntry'},
-            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'answer_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'answer_option': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['competition.CompetitionAnswerOption']", 'null': 'True', 'blank': 'True'}),
+            'answer_text': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'competition': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'competition_entries'", 'to': "orm['competition.Competition']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -134,18 +201,34 @@ class Migration(SchemaMigration):
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'likes_closed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'likes_enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'location': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['atlas.Location']", 'null': 'True', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'primary_category': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'primary_modelbase_set'", 'null': 'True', 'to': "orm['category.Category']"}),
-            'publish_on': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'publish_on': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'publishers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['publisher.Publisher']", 'null': 'True', 'blank': 'True'}),
-            'retract_on': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'retract_on': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'sites': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sites.Site']", 'null': 'True', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
             'state': ('django.db.models.fields.CharField', [], {'default': "'unpublished'", 'max_length': '32', 'null': 'True', 'blank': 'True'}),
             'subtitle': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['category.Tag']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'view_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
+        },
+        'photologue.photo': {
+            'Meta': {'ordering': "['-date_added']", 'object_name': 'Photo'},
+            'caption': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'crop_from': ('django.db.models.fields.CharField', [], {'default': "'center'", 'max_length': '10', 'blank': 'True'}),
+            'date_added': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'date_taken': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'effect': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'photo_related'", 'null': 'True', 'to': "orm['photologue.PhotoEffect']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'is_public': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'tags': ('photologue.models.TagField', [], {'max_length': '255', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
+            'title_slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50'}),
             'view_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
         },
         'photologue.photoeffect': {

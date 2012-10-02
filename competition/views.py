@@ -1,60 +1,49 @@
-from jmbo.generic.views import GenericObjectList, GenericObjectDetail
-
-from preferences import preferences
+from django.utils.translation import ugettext as _
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
 
 from competition.models import Competition, CompetitionPreferences
-from competition.view_modifiers import CompetitionViewModifier
-from competition.forms import CompetitionEntryForm
+from competition.forms import CompetitionBaseEntryForm, \
+    SingleAnswerEntryForm, MultichoiceEntryForm, FileUploadEntryForm
 
 
-class ObjectList(GenericObjectList):
-    def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions'}
+def competition_terms(request, slug):
+    competition = get_object_or_404(Competition.permitted, slug=slug)
+    extra = {"title": _("Competition terms"), "competition": competition}
+    preferences = CompetitionPreferences.objects.all()
+    if preferences:
+        preferences = preferences[0]
+        extra['preferences'] = preferences
 
-    def get_view_modifier(self, request, *args, **kwargs):
-        return CompetitionViewModifier(request=request, slug=None)
-
-    def get_paginate_by(self, *args, **kwargs):
-        return 7
-
-    def get_queryset(self, *args, **kwargs):
-        return Competition.permitted.all().order_by('start_date')
-
-object_list = ObjectList()
+    return render_to_response("competition/competition_terms.html", extra,
+        context_instance=RequestContext(request))
 
 
-class ObjectDetail(GenericObjectDetail):
-    def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions', 'competition_entry_form': CompetitionEntryForm()}
+def competition_detail(request, slug):
+    competition = get_object_or_404(Competition.permitted, slug=slug)
+    # determine which form to use for the competition
+    if competition.question and competition.answer_type:
+        if competition.answer_type == 'free_text_input':
+            form_class = SingleAnswerEntryForm
+        elif competition.answer_type == 'multiple_choice_selection':
+            form_class = MultichoiceEntryForm
+        else:
+            form_class = FileUploadEntryForm
+    else:
+        form_class = CompetitionBaseEntryForm
 
-    def get_view_modifier(self, request, *args, **kwargs):
-        return CompetitionViewModifier(request=request, slug=None)
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES,
+            request=request, competition=competition)
+        if form.is_valid():
+            form.save()
+            msg = _("You have entered the competition")
+            messages.success(request, msg, fail_silently=True)
+    else:
+        form = form_class(request=request, competition=competition)
+    
+    extra = {"competition_entry_form": form, "object": competition}
+    return render_to_response("competition/competition_detail.html", extra,
+        context_instance=RequestContext(request))
 
-    def get_queryset(self, *args, **kwargs):
-        return Competition.permitted.all()
-
-object_detail = ObjectDetail()
-
-
-class PreferencesInfo(GenericObjectDetail):
-    def get_extra_context(self, *args, **kwargs):
-        return {'title': 'Competitions'}
-
-    def get_view_modifier(self, request, *args, **kwargs):
-        return CompetitionViewModifier(request=request, slug=None)
-
-    def get_queryset(self, *args, **kwargs):
-        return CompetitionPreferences.objects.all()
-
-    def get_template_name(self, *args, **kwargs):
-        return 'competition/competitionpreferences_detail.html'
-
-    def __call__(self, request, *args, **kwargs):
-        self.params['object_id'] = preferences.CompetitionPreferences.id
-        return super(PreferencesInfo, self).__call__(
-            request,
-            *args,
-            **kwargs
-        )
-
-preferences_info = PreferencesInfo()

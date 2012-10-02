@@ -7,6 +7,11 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("foundry", "0001_initial"),
+        ("jmbo", "0004_auto__add_field_modelbase_location"),
+    )
+
     def forwards(self, orm):
         # Adding model 'CompetitionAnswerOption'
         db.create_table('competition_competitionansweroption', (

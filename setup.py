@@ -11,8 +11,7 @@ setup(
     url='http://github.com/praekelt/jmbo-competition',
     packages = find_packages(),
     install_requires = [
-        'jmbo',
-        'django-ckeditor',
+        'jmbo-foundry',
     ],
     tests_require=[
         'django-setuptest',
