@@ -82,9 +82,6 @@ class Competition(ModelBase):
         if self.correct_answer:
             self.correct_answer_list = [a.strip() for a in self.correct_answer.split(",")]
 
-    def get_absolute_url(self):
-        return reverse('competition-detail', kwargs={'slug': self.slug})
-
     def can_enter(self, request):
         if request.user.is_authenticated():
             current_date = timezone.now().date()
