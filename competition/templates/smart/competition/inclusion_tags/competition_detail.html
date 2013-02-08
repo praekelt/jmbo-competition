@@ -8,9 +8,9 @@
 
     {% if can_enter %}
         {% if competition_entry_form.is_multipart %}
-            <form enctype="multipart/form-data" action="{% url competition-detail object.slug %}" method="POST" {% if object.check_in_distance %}style="display: none;"{% endif %}>
+            <form enctype="multipart/form-data" action="{% url competition_object_detail object.slug %}" method="POST" {% if object.check_in_distance %}style="display: none;"{% endif %}>
         {% else %}
-            <form action="{% url competition-detail object.slug %}" method="POST" {% if object.check_in_distance %}style="display: none;"{% endif %}>
+            <form action="{% url competition_object_detail object.slug %}" method="POST" {% if object.check_in_distance %}style="display: none;"{% endif %}>
         {% endif %}
             {% if object.question %}
                 <div class="title question">{{ object.question }}</div>
