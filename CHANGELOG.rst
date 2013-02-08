@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.1
+-----
 #. Add an URL rule that yields prettier urls.
 
 0.1
