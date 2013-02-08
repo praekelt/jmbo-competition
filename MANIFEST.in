@@ -2,6 +2,6 @@ include AUTHORS.rst
 include LICENSE
 include README.rst
 include CHANGELOG.rst
-recursive-include competition/fixtures *
+recursive-include competition/migrations *
 recursive-include competition/templates *
 recursive-include competition/templatetags *
