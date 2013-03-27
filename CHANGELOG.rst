@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Redirect back to competition after login.
+
 0.1.1
 -----
 #. Add an URL rule that yields prettier urls.
