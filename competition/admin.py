@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from preferences.admin import PreferencesAdmin
 
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
+from foundry.models import Member
 
 from competition.models import Competition, CompetitionEntry, \
         CompetitionPreferences, CompetitionAnswerOption
@@ -114,13 +115,28 @@ def mark_winner(modeladmin, request, queryset):
 mark_winner.short_description = "Mark selected entries as winners"
 
 class CompetitionEntryAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'user_link', 'has_correct_answer', 'file_link', 'winner')
+    list_display = ('__unicode__', 'user_link', 'user_fullname',
+            'user_email', 'user_cellnumber', 'has_correct_answer',
+            'file_link', 'winner')
     list_filter = ('competition', 'winner')
     actions = [mark_winner]
 
     def user_link(self, obj):
         return '<a href="%s">%s</a>' % (reverse('admin:foundry_member_change', args=(obj.user.id, )), obj.user.__unicode__())
     user_link.allow_tags = True
+
+    def user_fullname(self, obj):
+        return obj.user.get_full_name()
+
+    def user_email(self, obj):
+        return obj.user.email
+
+    def user_cellnumber(self, obj):
+        try:
+            member = Member.objects.get(pk=obj.user.pk)
+            return member.mobile_number
+        except Member.DoesNotExist:
+            return 'Unknown'
     
     def file_link(self, obj):
         if obj.competition.answer_type == 'file_upload':
