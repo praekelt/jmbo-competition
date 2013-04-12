@@ -1,13 +1,18 @@
+from snippetscream.csv_serializer import UnicodeWriter
+
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import BooleanFieldListFilter
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.conf.urls.defaults import patterns
 
 from preferences.admin import PreferencesAdmin
 
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
+from foundry.models import Member
 
 from competition.models import Competition, CompetitionEntry, \
         CompetitionPreferences, CompetitionAnswerOption
@@ -114,19 +119,73 @@ def mark_winner(modeladmin, request, queryset):
 mark_winner.short_description = "Mark selected entries as winners"
 
 class CompetitionEntryAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'user_link', 'has_correct_answer', 'file_link', 'winner')
+    list_display = ('__unicode__', 'user_link', 'user_fullname',
+            'user_email', 'user_cellnumber', 'has_correct_answer',
+            'file_link', 'winner')
     list_filter = ('competition', 'winner')
     actions = [mark_winner]
 
     def user_link(self, obj):
         return '<a href="%s">%s</a>' % (reverse('admin:foundry_member_change', args=(obj.user.id, )), obj.user.__unicode__())
     user_link.allow_tags = True
+
+    def user_fullname(self, obj):
+        return obj.user.get_full_name()
+
+    def user_email(self, obj):
+        return obj.user.email
+
+    def user_cellnumber(self, obj):
+        try:
+            member = Member.objects.get(pk=obj.user.pk)
+            return member.mobile_number
+        except Member.DoesNotExist:
+            return 'Unknown'
     
     def file_link(self, obj):
         if obj.competition.answer_type == 'file_upload':
             return '<a href="%s">Download file</a>' % (obj.answer_file.url, )
         return ''
     file_link.allow_tags = True
+
+    def get_urls(self):
+        """ Extend the admin urls for the CompetitionEntryAdmin model
+            to be able to invoke a CSV export view  on the admin model """
+        urls = super(CompetitionEntryAdmin, self).get_urls()
+        csv_urls = patterns('',
+            (r'^exportcsv/$', self.admin_site.admin_view(self.csv_export))
+        )
+        return csv_urls + urls
+
+    def csv_export(self, request):
+        """ Return a CSV document of the competition entry and its user
+            details
+        """
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=competitionentries.csv'
+
+        # create the csv writer with the response as the output file
+        writer = UnicodeWriter(response)
+        writer.writerow([
+            'First Name', 'Last Name', 'Email Address', 'Cell Number',
+            'Question', 'Answer File', 'Answer Option', 'Answer Text',
+            'Has Correct Answer', 'Winner', 'Time Stamp'
+            ])
+        for entry in self.queryset(request):
+            writer.writerow([
+                entry.user.first_name, entry.user.last_name,
+                entry.user.email, 
+                "%s" % self.user_cellnumber(entry),
+                "%s" % entry.competition.question, 
+                "%s" % entry.answer_file.name, 
+                "%s" % entry.answer_option.text,
+                "%s" % entry.answer_text, 
+                "%s" % entry.has_correct_answer(),
+                "%s" % entry.winner,
+                "%s" % entry.timestamp
+                ])
+
+        return response
 
 
 admin.site.register(Competition, CompetitionAdmin)
