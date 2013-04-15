@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.2
+-----
+#. Redirect back to competition after login.
+#. CSV export of competition winners.
+
 0.1.1
 -----
 #. Add an URL rule that yields prettier urls.
