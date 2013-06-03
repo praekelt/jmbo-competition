@@ -181,7 +181,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
                 "%s" % entry.competition.question, 
                 "%s" % entry.answer_file.name, 
                 "%s" % entry.answer_option.text if entry.answer_option else '',
-                "%s" % entry.answer_text, 
+                "%s" % entry.answer_text if entry.answer_text else '', 
                 "%s" % entry.has_correct_answer(),
                 "%s" % entry.winner,
                 "%s" % entry.timestamp
