@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import BooleanFieldListFilter
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.conf.urls.defaults import patterns
+from django.conf.urls.defaults import patterns, url
 
 from preferences.admin import PreferencesAdmin
 
@@ -153,7 +153,11 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             to be able to invoke a CSV export view  on the admin model """
         urls = super(CompetitionEntryAdmin, self).get_urls()
         csv_urls = patterns('',
-            (r'^exportcsv/$', self.admin_site.admin_view(self.csv_export))
+            url(
+                r'^exportcsv/$',
+                self.admin_site.admin_view(self.csv_export),
+                name='competition-csv-export'
+            )
         )
         return csv_urls + urls
 
