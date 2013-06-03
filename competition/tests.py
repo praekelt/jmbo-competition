@@ -12,7 +12,7 @@ from competition.models import Competition, CompetitionEntry
 class CompetitionTestCase(TestCase):
 
     def test_entry_export(self):
-        comp = Competition.objects.create(title="Test Comp", 
+        comp = Competition.objects.create(title="Test Comp",
                                           start_date=timezone.now(),
                                           end_date=timezone.now() + timedelta(hours=1))
         member = Member(username="Users %s" % timezone.now())
@@ -24,3 +24,4 @@ class CompetitionTestCase(TestCase):
         self.client.login(username=member.username, password="password")
         response = self.client.get(reverse('admin:competition-csv-export'))
         self.assertContains(response, member.username)
+        self.assertNotContains(response, 'None')
