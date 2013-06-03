@@ -140,7 +140,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             member = Member.objects.get(pk=obj.user.pk)
             return member.mobile_number
         except Member.DoesNotExist:
-            return 'Unknown'
+            return ''
     
     def file_link(self, obj):
         if obj.competition.answer_type == 'file_upload':
@@ -167,28 +167,25 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
         # create the csv writer with the response as the output file
         writer = UnicodeWriter(response)
         writer.writerow([
-            'First Name', 'Last Name', 'Email Address', 'Cell Number',
-            'Question', 'Answer File', 'Answer Option', 'Answer Text',
+            'Competition ID', 'Competition', 'First Name', 'Last Name', 'Email Address', 
+            'Cell Number', 'Question', 'Answer File', 'Answer Option', 'Answer Text', 
             'Has Correct Answer', 'Winner', 'Time Stamp'
             ])
         for entry in self.queryset(request):
-            try:
-                writer.writerow([
-                    entry.user.first_name, entry.user.last_name,
-                    entry.user.email, 
-                    "%s" % self.user_cellnumber(entry),
-                    "%s" % entry.competition.question, 
-                    "%s" % entry.answer_file.name, 
-                    "%s" % entry.answer_option.text,
-                    "%s" % entry.answer_text, 
-                    "%s" % entry.has_correct_answer(),
-                    "%s" % entry.winner,
-                    "%s" % entry.timestamp
-                    ])
-            except AttributeError:
-                # There was an error reported on Jacaranda for an None valued answer_option
-                # that raised an AttributeError. This should catch such errors.
-                continue
+            writer.writerow([
+                "%s" % entry.competition.id,
+                entry.competition.title,
+                entry.user.first_name, entry.user.last_name,
+                entry.user.email, 
+                "%s" % self.user_cellnumber(entry),
+                "%s" % entry.competition.question, 
+                "%s" % entry.answer_file.name, 
+                "%s" % entry.answer_option.text if entry.answer_option else '',
+                "%s" % entry.answer_text, 
+                "%s" % entry.has_correct_answer(),
+                "%s" % entry.winner,
+                "%s" % entry.timestamp
+                ])
 
         return response
 
