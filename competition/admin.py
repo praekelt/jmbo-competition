@@ -172,18 +172,23 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             'Has Correct Answer', 'Winner', 'Time Stamp'
             ])
         for entry in self.queryset(request):
-            writer.writerow([
-                entry.user.first_name, entry.user.last_name,
-                entry.user.email, 
-                "%s" % self.user_cellnumber(entry),
-                "%s" % entry.competition.question, 
-                "%s" % entry.answer_file.name, 
-                "%s" % entry.answer_option.text,
-                "%s" % entry.answer_text, 
-                "%s" % entry.has_correct_answer(),
-                "%s" % entry.winner,
-                "%s" % entry.timestamp
-                ])
+            try:
+                writer.writerow([
+                    entry.user.first_name, entry.user.last_name,
+                    entry.user.email, 
+                    "%s" % self.user_cellnumber(entry),
+                    "%s" % entry.competition.question, 
+                    "%s" % entry.answer_file.name, 
+                    "%s" % entry.answer_option.text,
+                    "%s" % entry.answer_text, 
+                    "%s" % entry.has_correct_answer(),
+                    "%s" % entry.winner,
+                    "%s" % entry.timestamp
+                    ])
+            except AttributeError:
+                # There was an error reported on Jacaranda for an None valued answer_option
+                # that raised an AttributeError. This should catch such errors.
+                continue
 
         return response
 
