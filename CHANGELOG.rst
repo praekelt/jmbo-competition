@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.12.1
+------
+#. Fixes CSV export crash when an attribute is None. Uses empty string when value is None.
+
 0.1.2
 -----
 #. Redirect back to competition after login.
