@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='jmbo-competition',
-    version='0.1.2',
+    version='0.1.2.1',
     description='Jmbo competition app.',
     long_description = open('README.rst', 'r').read() + open('AUTHORS.rst', 'r').read() + open('CHANGELOG.rst', 'r').read(),
     author='Praekelt International',
@@ -14,9 +14,9 @@ setup(
         'jmbo-foundry>=1.0',
     ],
     tests_require=[
-        'django-setuptest',
+        'django-setuptest>=0.1.2',
     ],
-    test_suite="setuptest.SetupTestSuite",
+    test_suite="setuptest.setuptest.SetupTestSuite",
     include_package_data=True,
     classifiers = [
         "Programming Language :: Python",
