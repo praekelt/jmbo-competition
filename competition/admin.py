@@ -94,10 +94,10 @@ class CompetitionAdmin(ModelBaseAdmin):
                 except:
                     continue
         self.fieldsets[0][1]['fields'] += one_liners
-        
+
         question_fieldset = (('Competition question', {
             'fields': ('question', 'question_blurb', 'answer_type', 'correct_answer', 'max_file_size'),
-            }), )
+        }), )
         for field in question_fieldset[0][1]['fields']:
             try:
                 fields = self.fieldsets[0][1]['fields']
@@ -118,10 +118,11 @@ def mark_winner(modeladmin, request, queryset):
     queryset.update(winner=True)
 mark_winner.short_description = "Mark selected entries as winners"
 
+
 class CompetitionEntryAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'user_link', 'user_fullname',
-            'user_email', 'user_cellnumber', 'has_correct_answer',
-            'file_link', 'winner')
+                    'user_email', 'user_cellnumber', 'has_correct_answer',
+                    'file_link', 'winner')
     list_filter = ('competition', 'winner')
     actions = [mark_winner]
 
@@ -141,7 +142,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             return member.mobile_number
         except Member.DoesNotExist:
             return ''
-    
+
     def file_link(self, obj):
         if obj.competition.answer_type == 'file_upload':
             return '<a href="%s">Download file</a>' % (obj.answer_file.url, )
@@ -171,25 +172,26 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
         # create the csv writer with the response as the output file
         writer = UnicodeWriter(response)
         writer.writerow([
-            'Competition ID', 'Competition', 'First Name', 'Last Name', 'Email Address', 
-            'Cell Number', 'Question', 'Answer File', 'Answer Option', 'Answer Text', 
+            'Competition ID', 'Competition', 'First Name', 'Last Name', 'Email Address',
+            'Cell Number', 'Question', 'Answer File', 'Answer Option', 'Answer Text',
             'Has Correct Answer', 'Winner', 'Time Stamp'
-            ])
+        ])
         for entry in self.queryset(request):
-            writer.writerow([
-                "%s" % entry.competition.id,
+            row = [
+                entry.competition.id,
                 entry.competition.title,
                 entry.user.first_name, entry.user.last_name,
-                entry.user.email, 
-                "%s" % self.user_cellnumber(entry),
-                "%s" % entry.competition.question, 
-                "%s" % entry.answer_file.name, 
-                "%s" % entry.answer_option.text if entry.answer_option else '',
-                "%s" % entry.answer_text if entry.answer_text else '', 
-                "%s" % entry.has_correct_answer(),
-                "%s" % entry.winner,
-                "%s" % entry.timestamp
-                ])
+                entry.user.email,
+                self.user_cellnumber(entry),
+                entry.competition.question,
+                entry.answer_file.name if entry.answer_file else '',
+                entry.answer_option.text if entry.answer_option else '',
+                entry.answer_text,
+                entry.has_correct_answer(),
+                entry.winner,
+                entry.timestamp
+            ]
+            writer.writerow(['' if f is None else str(f) for f in row])  # '' instead of None
 
         return response
 

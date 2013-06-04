@@ -15,7 +15,7 @@ class CompetitionTestCase(TestCase):
         comp = Competition.objects.create(title="Test Comp",
                                           start_date=timezone.now(),
                                           end_date=timezone.now() + timedelta(hours=1))
-        member = Member(username="Users %s" % timezone.now())
+        member = Member(username="user_%s" % timezone.now())
         member.first_name = member.username
         member.set_password("password")
         member.is_staff = True
