@@ -5,7 +5,7 @@ Copy of jmbo/templates/jmbo/modelbase_detail.html. render_object replaced since
 the can_enter variable needs to be set.
 {% endcomment %}
 
-{% load jmbo_inclusion_tags competition_tags %} 
+{% load jmbo_inclusion_tags competition_tags %}
 
 {% block content %}
     <div class="page section_news object-detail {{ object.class_name.lower }}-detail">
@@ -13,7 +13,7 @@ the can_enter variable needs to be set.
         {% if view_modifier %}
             <div class="title">
                 {{ title }}
-            </div>      
+            </div>
             {% view_modifier view_modifier %}
         {% endif %}
 
