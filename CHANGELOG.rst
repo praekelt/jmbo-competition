@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.3
+-----
 #. Do not display canonical image if content contains an image.
 
 0.1.2.1
