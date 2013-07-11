@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.4
+-----
 #. Handle case where competition is edited after entries have been received.
 #. Export now handles unicode correctly.
 
