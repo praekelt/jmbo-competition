@@ -19,7 +19,7 @@ from competition.models import Competition, CompetitionEntry, \
 
 
 class CompetitionAnswerOptionAdminFormSet(BaseInlineFormSet):
-    
+
     def clean(self):
         cleaned_data = super(CompetitionAnswerOptionAdminFormSet, self).clean()
         if any(self.errors):
@@ -45,7 +45,7 @@ class CompetitionAnswerOptionAdminFormSet(BaseInlineFormSet):
                 if self.instance.answer_type == 'multiple_choice_selection':
                     raise forms.ValidationError(_("The answer type is set to 'Multiple choice selection' but there are no answer options."))
         return cleaned_data
-    
+
 
 class CompetitionAdminForm(ModelBaseAdminForm):
 
@@ -191,7 +191,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
                 entry.winner,
                 entry.timestamp
             ]
-            writer.writerow(['' if f is None else str(f) for f in row])  # '' instead of None
+            writer.writerow(['' if f is None else unicode(f) for f in row])  # '' instead of None
 
         return response
 
