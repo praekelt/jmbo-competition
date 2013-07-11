@@ -115,12 +115,12 @@ class CompetitionAnswerOption(models.Model):
         default=False,
         help_text="Is this option the correct answer?"
     )
-    
+
     def __unicode__(self):
         return self.text
 
 
-def get_file_upload_path(instance, filename):        
+def get_file_upload_path(instance, filename):
     return "competition/%s/%d_%s%s" % (instance.competition.slug, \
         instance.user.id, timezone.now().strftime('%d-%m-%y %H:%M:%S.%f'), \
         os.path.splitext(filename)[1])
@@ -137,7 +137,7 @@ class CompetitionEntry(models.Model):
     answer_text = models.CharField(
         max_length=255,
         null=True,
-        blank=True 
+        blank=True
     )
     answer_option = models.ForeignKey(
         CompetitionAnswerOption,
@@ -169,7 +169,9 @@ class CompetitionEntry(models.Model):
                     return False
                 return True
             else:
-                return self.answer_option.is_correct_answer
+                # answer_option can be None if a competition definition was
+                # changed after entries had been received.
+                return self.answer_option and self.answer_option.is_correct_answer
         return True  # unless an answer is explicitly wrong, don't return False
     has_correct_answer.short_description = "Correct/valid entry"
 

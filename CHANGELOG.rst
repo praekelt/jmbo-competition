@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.4
+-----
+#. Handle case where competition is edited after entries have been received.
+#. Export now handles unicode correctly.
+
 0.1.3
 -----
 #. Do not display canonical image if content contains an image.
