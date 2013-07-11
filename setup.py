@@ -14,7 +14,7 @@ setup(
         'jmbo-foundry>=1.0',
     ],
     tests_require=[
-        'django-setuptest>=0.1.2',
+        'django-setuptest>=0.1.4',
     ],
     test_suite="setuptest.setuptest.SetupTestSuite",
     include_package_data=True,
