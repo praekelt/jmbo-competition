@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.5
+-----
 #. Speed up competition entry export.
 
 0.1.4
