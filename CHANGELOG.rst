@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Speed up competition entry export.
+
 0.1.4
 -----
 #. Handle case where competition is edited after entries have been received.
