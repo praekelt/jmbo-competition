@@ -121,7 +121,7 @@ mark_winner.short_description = "Mark selected entries as winners"
 
 class CompetitionEntryAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'user_link', 'user_fullname',
-                    'user_email', 'user_cellnumber', 'has_correct_answer',
+                    'user_email', 'user_mobile_number', 'has_correct_answer',
                     'file_link', 'winner')
     list_filter = ('competition', 'winner')
     actions = [mark_winner]
@@ -136,7 +136,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
     def user_email(self, obj):
         return obj.user.email
 
-    def user_cellnumber(self, obj):
+    def user_mobile_number(self, obj):
         try:
             member = Member.objects.get(pk=obj.user.pk)
             return member.mobile_number
@@ -176,13 +176,36 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             'Cell Number', 'Question', 'Answer File', 'Answer Option', 'Answer Text',
             'Has Correct Answer', 'Winner', 'Time Stamp'
         ])
+
+        # select_related is too slow, so cache for fast lookups. This will not
+        # scale indefinitely.
+        competition_map = {}
+        ids = self.queryset(request).distinct('competition').values_list(
+            'competition_id', flat=True
+        )
+        for obj in Competition.objects.filter(id__in=ids):
+            competition_map[obj.id] = obj
+
+        # Looking up individual members is too slow, so cache for fast
+        # lookups. This will not scale indefinitely.
+        member_mobile_number_map = {}
+        ids = self.queryset(request).distinct('user').values_list(
+            'user_id', flat=True
+        )
+        for di in Member.objects.filter(id__in=ids).values(
+            'id', 'mobile_number'
+            ):
+            member_mobile_number_map[di['id']] = di['mobile_number']
+
         for entry in self.queryset(request):
+            competition = competition_map[entry.competition_id]
+            entry.competition = competition
             row = [
                 entry.competition.id,
                 entry.competition.title,
                 entry.user.first_name, entry.user.last_name,
                 entry.user.email,
-                self.user_cellnumber(entry),
+                member_mobile_number_map.get(entry.user_id, ''),
                 entry.competition.question,
                 entry.answer_file.name if entry.answer_file else '',
                 entry.answer_option.text if entry.answer_option else '',
