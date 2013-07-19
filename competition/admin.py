@@ -177,10 +177,26 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             'Has Correct Answer', 'Winner', 'Time Stamp'
         ])
 
+        # This sucks big time. get_urls is cached upon first call, which means
+        # it has no concept of a filter currently being applied to the
+        # changelist. Grab the querystring from the referrer and re-use
+        # changelist API to apply the filtering for us.
+        try:
+            dc, qs = request.META.get('HTTP_REFERER', '').split('?')
+        except ValueError:
+            qs = ''
+        request.META['QUERY_STRING'] = qs
+        queryset = self.get_changelist(request)(
+            request, self.model, self.list_display, self.list_display_links,
+            self.list_filter, self.date_hierarchy, self.search_fields,
+            self.list_select_related, self.list_per_page,
+            self.list_max_show_all, self.list_editable, self
+        ).get_query_set(request)
+
         # select_related is too slow, so cache for fast lookups. This will not
         # scale indefinitely.
         competition_map = {}
-        ids = self.queryset(request).distinct('competition').values_list(
+        ids = queryset.distinct('competition').values_list(
             'competition_id', flat=True
         )
         for obj in Competition.objects.filter(id__in=ids):
@@ -189,7 +205,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
         # Looking up individual members is too slow, so cache for fast
         # lookups. This will not scale indefinitely.
         member_mobile_number_map = {}
-        ids = self.queryset(request).distinct('user').values_list(
+        ids = queryset.distinct('user').values_list(
             'user_id', flat=True
         )
         for di in Member.objects.filter(id__in=ids).values(
@@ -197,7 +213,7 @@ class CompetitionEntryAdmin(admin.ModelAdmin):
             ):
             member_mobile_number_map[di['id']] = di['mobile_number']
 
-        for entry in self.queryset(request):
+        for entry in queryset:
             competition = competition_map[entry.competition_id]
             entry.competition = competition
             row = [
