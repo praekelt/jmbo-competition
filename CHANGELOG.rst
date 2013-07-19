@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.6
+-----
 #. Apply changelist filters to competition entry export.
 
 0.1.5
