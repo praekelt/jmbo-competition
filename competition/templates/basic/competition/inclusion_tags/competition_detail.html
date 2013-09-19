@@ -2,12 +2,14 @@
 {% load i18n jmbo_template_tags humanize %}
 
 {% block content %}
-    {% if '<img' not in object.content %}
-        {% if object.image %}
-            <img src="{{ object.image_detail_url }}" />
+    {% jmbocache 3600 'object-detail-inclusion' object.id object.modified %}
+        {% if '<img' not in object.content %}
+            {% if object.image %}
+                <img src="{{ object.image_detail_url }}" />
+            {% endif %}
         {% endif %}
-    {% endif %}
-    {{ object.content|safe }}
+        {{ object.content|safe }}
+    {% endjmbocache %}
 
     {% if can_enter %}
         {% if competition_entry_form.is_multipart %}
@@ -22,7 +24,7 @@
             {% csrf_token %}
             {% for field in competition_entry_form.visible_fields %}
                 {% if field.name == "accept_terms" %}
-                    <div class="field">{{ field.errors }} {{ field }} 
+                    <div class="field">{{ field.errors }} {{ field }}
                         {% url competition-terms object.slug as terms_url %}
                         {% blocktrans %}I accept the <a href="{{ terms_url }}">terms</a> of this competition{% endblocktrans %}
                    </div>
@@ -41,20 +43,22 @@
             </div>
         </form>
     {% else %}
-        <p class="reason">
-            {% if reason == 'auth_required' %}
-                <a href="{% url login %}?next={{ request.META.PATH_INFO }}">{% trans "You must be signed in to enter" %}</a>.
-            {% else %}
-                {% if reason == 'max_entries' %}
-                    {% trans "You have entered this competition the maximum number of times" %}.
+        {% jmbocache 3600 'object-detail-inclusion-reason' object.id object.modified reason %}
+            <p class="reason">
+                {% if reason == 'auth_required' %}
+                    <a href="{% url login %}?next={{ request.META.PATH_INFO }}">{% trans "You must be signed in to enter" %}</a>.
                 {% else %}
-                    {% if reason == 'ended' %}
-                        {% trans "The competition is closed" %}.
+                    {% if reason == 'max_entries' %}
+                        {% trans "You have entered this competition the maximum number of times" %}.
                     {% else %}
-                        {% trans "The competition opens" %} {{ object.start_date|naturalday:"D d N 'y" }}.
+                        {% if reason == 'ended' %}
+                            {% trans "The competition is closed" %}.
+                        {% else %}
+                            {% trans "The competition opens" %} {{ object.start_date|naturalday:"D d N 'y" }}.
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
-        </p>
+            </p>
+        {% endjmbocache %}
     {% endif %}
 {% endblock %}
