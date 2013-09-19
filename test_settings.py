@@ -1,8 +1,6 @@
 from foundry.settings import *
 
 
-# We cannot use ssqlite or spatialite because it cannot handle the 'distinct'
-# in admin.py.
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -14,4 +12,4 @@ DATABASES = {
     }
 }
 
-SOUTH_TESTS_MIGRATE = False
+# Need this last line until django-setuptest is improved.
