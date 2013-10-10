@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.1.7
+-----
+#. Cache templates.
+
 0.1.6
 -----
 #. Apply changelist filters to competition entry export.

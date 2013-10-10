@@ -2,12 +2,14 @@
 {% load i18n jmbo_template_tags humanize %}
 
 {% block content %}
-    {% if '<img' not in object.content %}
-        {% if object.image %}
-            <img src="{{ object.image_detail_url }}" />
+    {% jmbocache 3600 'object-detail-inclusion' object.id object.modified %}
+        {% if '<img' not in object.content %}
+            {% if object.image %}
+                <img src="{{ object.image_detail_url }}" />
+            {% endif %}
         {% endif %}
-    {% endif %}
-    {{ object.content|safe }}
+        {{ object.content|safe }}
+    {% endjmbocache %}
 
     {% if can_enter %}
         {% if competition_entry_form.is_multipart %}
@@ -22,7 +24,7 @@
             {% csrf_token %}
             {% for field in competition_entry_form.visible_fields %}
                 {% if field.name == "accept_terms" %}
-                    <div class="field">{{ field.errors }} {{ field }} 
+                    <div class="field">{{ field.errors }} {{ field }}
                         {% url competition-terms object.slug as terms_url %}
                         {% blocktrans %}I accept the <a href="{{ terms_url }}">terms</a> of this competition{% endblocktrans %}
                    </div>
@@ -40,66 +42,71 @@
                 <input type="submit" value="{% trans "Submit entry" %}" />
             </div>
         </form>
-        {% if object.check_in_distance %}
-        <div id="location-loading">
-            <img class="loading" src="{{ STATIC_URL }}images/loader.gif" alt="{% trans "loading" %}"></img>
-            <div id="location-loading-text">Locating...</div>
-            <script type="text/javascript">
-                function locate_for_competition() {
-                    var success = function (location) {
-                        var ya = {{ object.location.coordinates.y }};
-                        var xa = {{ object.location.coordinates.x }};
-                        var yb = location.coords.latitude;
-                        var xb = location.coords.longitude;
-                        var dist = 6378100 * 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((ya - yb) * Math.PI/180 / 2), 2) + Math.cos(ya * Math.PI/180) * Math.cos(yb * Math.PI/180) * Math.pow((Math.sin(xa - xb) * Math.PI/180 / 2), 2)));
-                        var container = $("#location-loading");
-                        $("img.loading", container).hide();
-                        if (dist <= {{ object.check_in_distance }}) {
-                            $(container).hide();
-                            $(".competition-detail-inclusion form").show()
-                                .children("#id_location").val("POINT (" + xb + " " + yb + ")");
+
+        {% jmbocache 3600 'object-detail-inclusion-checkin' object.id object.modified %}
+            {% if object.check_in_distance %}
+                <div id="location-loading">
+                    <img class="loading" src="{{ STATIC_URL }}images/loader.gif" alt="{% trans "loading" %}"></img>
+                    <div id="location-loading-text">Locating...</div>
+                    <script type="text/javascript">
+                        function locate_for_competition() {
+                            var success = function (location) {
+                                var ya = {{ object.location.coordinates.y }};
+                                var xa = {{ object.location.coordinates.x }};
+                                var yb = location.coords.latitude;
+                                var xb = location.coords.longitude;
+                                var dist = 6378100 * 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((ya - yb) * Math.PI/180 / 2), 2) + Math.cos(ya * Math.PI/180) * Math.cos(yb * Math.PI/180) * Math.pow((Math.sin(xa - xb) * Math.PI/180 / 2), 2)));
+                                var container = $("#location-loading");
+                                $("img.loading", container).hide();
+                                if (dist <= {{ object.check_in_distance }}) {
+                                    $(container).hide();
+                                    $(".competition-detail-inclusion form").show()
+                                        .children("#id_location").val("POINT (" + xb + " " + yb + ")");
+                                }
+                                else
+                                    $("#location-loading-text", container)
+                                        .html("{% blocktrans with location=object.location.name %}You are not close enough to {{ location }} to enter the competition, or you GPS might not be turned on. In the latter case, turn on your device's GPS and reload the page.{% endblocktrans %}");                            
+                            };
+                            var error = function (error) {
+                                var container = $("#location-loading");
+                                $("img.loading", container).hide();
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        $("#location-loading-text", container)
+                                            .html("{% blocktrans with site_name=CURRENT_SITE.name %}You have not given {{ site_name }} permission to access your location. Change this in your browser settings and reload the page to enter the competition.{% endblocktrans %}");
+                                        break;
+                                    default:
+                                        $("#location-loading-text", container)
+                                            .html("{% trans "An error has occurred while trying to locate you. Please try again later." %}");
+                                }
+                            };
+                            $(document).ready(function(){
+                                /* Geolocate the client */
+                                atlas.getLocation(success, error);
+                            });
                         }
-                        else
-                            $("#location-loading-text", container)
-                                .html("{% blocktrans with location=object.location.name %}You are not close enough to {{ location }} to enter the competition, or you GPS might not be turned on. In the latter case, turn on your device's GPS and reload the page.{% endblocktrans %}");                            
-                    };
-                    var error = function (error) {
-                        var container = $("#location-loading");
-                        $("img.loading", container).hide();
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                $("#location-loading-text", container)
-                                    .html("{% blocktrans with site_name=CURRENT_SITE.name %}You have not given {{ site_name }} permission to access your location. Change this in your browser settings and reload the page to enter the competition.{% endblocktrans %}");
-                                break;
-                            default:
-                                $("#location-loading-text", container)
-                                    .html("{% trans "An error has occurred while trying to locate you. Please try again later." %}");
-                        }
-                    };
-                    $(document).ready(function(){
-                        /* Geolocate the client */
-                        atlas.getLocation(success, error);
-                    });
-                }
-                locate_for_competition();
-            </script>
-        </div>
-        {% endif %}
+                        locate_for_competition();
+                    </script>
+                </div>
+            {% endif %}
+        {% endjmbocache %}
     {% else %}
-        <p class="reason">
-            {% if reason == 'auth_required' %}
-                <a href="{% url login %}">{% trans "You must be signed in to enter" %}</a>.
-            {% else %}
-                {% if reason == 'max_entries' %}
-                    {% trans "You have entered this competition the maximum number of times" %}.
+        {% jmbocache 3600 'object-detail-inclusion-reason' object.id object.modified reason %}
+            <p class="reason">
+                {% if reason == 'auth_required' %}
+                    <a href="{% url login %}?next={{ request.META.PATH_INFO }}">{% trans "You must be signed in to enter" %}</a>.
                 {% else %}
-                    {% if reason == 'ended' %}
-                        {% trans "The competition is closed" %}.
+                    {% if reason == 'max_entries' %}
+                        {% trans "You have entered this competition the maximum number of times" %}.
                     {% else %}
-                        {% trans "The competition opens" %} {{ object.start_date|naturalday:"D d N 'y" }}.
+                        {% if reason == 'ended' %}
+                            {% trans "The competition is closed" %}.
+                        {% else %}
+                            {% trans "The competition opens" %} {{ object.start_date|naturalday:"D d N 'y" }}.
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
-        </p>
+            </p>
+        {% endjmbocache %}
     {% endif %}
 {% endblock %}

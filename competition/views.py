@@ -42,8 +42,7 @@ def competition_detail(request, slug):
             messages.success(request, msg, fail_silently=True)
     else:
         form = form_class(request=request, competition=competition)
-    
+
     extra = {"competition_entry_form": form, "object": competition}
     return render_to_response("competition/competition_detail.html", extra,
         context_instance=RequestContext(request))
-
