@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.7
+-----
 #. Cache templates.
 
 0.1.6
