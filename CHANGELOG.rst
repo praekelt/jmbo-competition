@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Add missing object footer to detail page.
+
 0.1.7
 -----
 #. Cache templates.

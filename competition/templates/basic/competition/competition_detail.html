@@ -17,11 +17,12 @@ the can_enter variable needs to be set.
             {% view_modifier view_modifier %}
         {% endif %}
 
-        {% object_header object %}
+        {% with object.as_leaf_class as object %}
+            {% object_header object %}
+            {% competition_detail object %}
+            {% object_footer object %}
+            {% object_comments object %}
+        {% endwith %}
 
-        {% competition_detail object %}
-
-        {% object_comments object %}
-
-        </div><!--/page-->
+    </div>
 {% endblock %}
