@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import BooleanFieldListFilter
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 from preferences.admin import PreferencesAdmin
 

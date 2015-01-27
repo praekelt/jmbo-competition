@@ -13,9 +13,9 @@
 
     {% if can_enter %}
         {% if competition_entry_form.is_multipart %}
-            <form enctype="multipart/form-data" action="{% url competition-detail object.slug %}" method="POST">
+            <form enctype="multipart/form-data" action="{% url "competition-detail" object.slug %}" method="POST">
         {% else %}
-            <form action="{% url competition-detail object.slug %}" method="POST">
+            <form action="{% url "competition-detail" object.slug %}" method="POST">
         {% endif %}
             {% if object.question %}
                 <div class="title question">{{ object.question }}</div>
@@ -25,7 +25,7 @@
             {% for field in competition_entry_form.visible_fields %}
                 {% if field.name == "accept_terms" %}
                     <div class="field">{{ field.errors }} {{ field }}
-                        {% url competition-terms object.slug as terms_url %}
+                        {% url "competition-terms" object.slug as terms_url %}
                         {% blocktrans %}I accept the <a href="{{ terms_url }}">terms</a> of this competition{% endblocktrans %}
                    </div>
                 {% else %}
@@ -46,7 +46,7 @@
         {% jmbocache 3600 'object-detail-inclusion-reason' object.id object.modified reason %}
             <p class="reason">
                 {% if reason == 'auth_required' %}
-                    <a href="{% url login %}?next={{ request.META.PATH_INFO }}">{% trans "You must be signed in to enter" %}</a>.
+                    <a href="{% url "login" %}?next={{ request.META.PATH_INFO }}">{% trans "You must be signed in to enter" %}</a>.
                 {% else %}
                     {% if reason == 'max_entries' %}
                         {% trans "You have entered this competition the maximum number of times" %}.
