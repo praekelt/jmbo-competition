@@ -80,10 +80,12 @@
                                             .html("{% trans "An error has occurred while trying to locate you. Please try again later." %}");
                                 }
                             };
-                            $(document).ready(function(){
-                                /* Geolocate the client */
-                                atlas.getLocation(success, error);
-                            });
+                            if (typeof atlas != 'undefined'){
+                                $(document).ready(function(){
+                                    /* Geolocate the client */
+                                    atlas.getLocation(success, error);
+                                });
+                            }
                         }
                         locate_for_competition();
                     </script>
